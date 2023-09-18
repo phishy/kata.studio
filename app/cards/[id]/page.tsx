@@ -5,10 +5,12 @@ import Editor from "@monaco-editor/react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { Textarea } from "@/components/ui/textarea"
+import AddToList from "@/components/AddToList"
+import Select from "@/components/select"
 
 import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
 import { Switch } from "@/components/ui/switch"
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown from "react-markdown"
 
 export const revalidate = 60
 
@@ -62,7 +64,7 @@ export default function CardForm({ params }: PageProps) {
           {card.title}
         </h3>
         <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-500">
-          { card.question}
+          {card.question}
         </p>
       </div>
       <div className="mt-6 border-t border-gray-100">
@@ -89,7 +91,11 @@ export default function CardForm({ params }: PageProps) {
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
               <Switch onCheckedChange={(val) => setCodeView(val)} /> Code
-              {!codeView && <Textarea onChange={(val) => setCode(val.target.value)}>{code}</Textarea>}
+              {!codeView && (
+                <Textarea onChange={(val) => setCode(val.target.value)}>
+                  {code}
+                </Textarea>
+              )}
               {codeView && (
                 <Editor
                   key={codeView.toString()}
@@ -109,9 +115,16 @@ export default function CardForm({ params }: PageProps) {
                   }}
                 />
               )}
-              <Button type="button" onClick={doCheck} className="mt-5">
-                Check
-              </Button>
+              <div className="flex gap-1">
+                <Button type="button" onClick={doCheck} className="mt-5">
+                  Check
+                </Button>
+                <Button type="button" onClick={doCheck} className="mt-5">
+                  Save
+                </Button>
+              </div>
+              {/* <AddToList /> */}
+              <Select />
               <div className="mt-10">
                 {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
                 {answer.startsWith("Yes") && (

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useMutation } from "@tanstack/react-query"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Textarea } from "@/components/ui/textarea"
@@ -33,7 +34,25 @@ export default function NewCardForm() {
   let router = useRouter()
   const supabase = createClientComponentClient()
 
-  const { messages, input, handleInputChange, handleSubmit } = useChat()
+  const generate = useMutation({
+    mutationFn: async (question) => {
+      let content = `In JavaScript, what is the answer to this question? ${question}`
+      let messages = [{ role: "user", content }]
+
+      let res = await fetch("/api/chat", {
+        method: "POST",
+        body: JSON.stringify({ messages }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      let response = await res.json()
+      form.setValue("answer", response.response)
+      // return response.response
+    },
+  })
+  console.log("generate", generate)
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -43,23 +62,23 @@ export default function NewCardForm() {
    * Generates a chat message by sending a question to the chatbot API and setting the answer in the form.
    * @returns void
    */
-  async function generate(): Promise<void> {
-    let content = `In JavaScript, what is the answer to this question? ${
-      form.getValues().question
-    }`
-    let messages = [{ role: "user", content }]
+  // async function generate(): Promise<void> {
+  //   let content = `In JavaScript, what is the answer to this question? ${
+  //     form.getValues().question
+  //   }`
+  //   let messages = [{ role: "user", content }]
 
-    let res = await fetch("/api/chat", {
-      method: "POST",
-      body: JSON.stringify({ messages }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+  //   let res = await fetch("/api/chat", {
+  //     method: "POST",
+  //     body: JSON.stringify({ messages }),
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   })
 
-    let response = await res.json()
-    form.setValue("answer", response.response)
-  }
+  //   let response = await res.json()
+  //   form.setValue("answer", response.response)
+  // }
 
   /**
    * Handles form submission by inserting the form data into the "cards" table in Supabase.
@@ -68,6 +87,7 @@ export default function NewCardForm() {
    * @param data The form data to be inserted into the "cards" table.
    */
   async function onSubmit(data: z.infer<typeof FormSchema>) {
+    debugger;
     let { error } = await supabase.from("cards").insert(data)
     if (error) {
       alert("error")
@@ -75,10 +95,6 @@ export default function NewCardForm() {
     }
     router.push("/cards")
   }
-
-  let codeString = `import { useForm } from "react-hook-form" `
-  console.log("blargg", form.getValues())
-  console.log("blarg", form.getValues().answer)
 
   return (
     <Form {...form}>
@@ -129,7 +145,14 @@ export default function NewCardForm() {
           )}
         />
         <div className="flex gap-1">
-          <Button type="button" onClick={generate}>
+          <Button
+            type="button"
+            disabled={generate.isLoading}
+            onClick={(e) => {
+              e.preventDefault()
+              generate.mutate(form.getValues().question)
+            }}
+          >
             Generate
           </Button>
           <Button type="submit">Create</Button>

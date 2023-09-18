@@ -6,11 +6,21 @@ import { WebContainer, FileSystemTree } from "@webcontainer/api"
 import Loader from "./components/Loader"
 import posthog from "posthog-js"
 
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query"
+
 import { isWebContainerSupported } from "./src/utils"
 
 interface AppProps {
   children: ReactNode
 }
+
+const queryClient = new QueryClient()
 
 function App({ children }: AppProps) {
   const [webContainer, setWebContainer] = useState<any>(null)
@@ -97,9 +107,11 @@ function App({ children }: AppProps) {
   // }
 
   return (
-    <WebContainerContext.Provider value={{ webContainer, webContainerReady }}>
-      {children}
-    </WebContainerContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <WebContainerContext.Provider value={{ webContainer, webContainerReady }}>
+        {children}
+      </WebContainerContext.Provider>
+    </QueryClientProvider>
   )
 }
 
