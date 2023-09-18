@@ -4,6 +4,8 @@ import Link from "next/link"
 
 import './globals.css'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: "kata.studio",
   description: "Level up your programming skills",
