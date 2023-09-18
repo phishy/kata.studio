@@ -12,9 +12,15 @@ import ReactMarkdown from 'react-markdown'
 
 export const revalidate = 60
 
-export default function CardForm({ params }) {
+interface PageProps {
+  params: {
+    id: string
+  }
+}
+
+export default function CardForm({ params }: PageProps) {
   const [card, setCard] = useState<any>({})
-  const [code, setCode] = useState<string>("")
+  const [code, setCode] = useState<any>("")
   const [codeView, setCodeView] = useState<boolean>(false)
   const [answer, setAnswer] = useState<string>("")
   const supabase = createClientComponentClient()
@@ -86,7 +92,7 @@ export default function CardForm({ params }) {
               {!codeView && <Textarea onChange={(val) => setCode(val.target.value)}>{code}</Textarea>}
               {codeView && (
                 <Editor
-                  key={codeView}
+                  key={codeView.toString()}
                   theme="vs-dark"
                   height="30vh"
                   defaultLanguage="javascript"

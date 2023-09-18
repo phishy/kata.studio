@@ -6,7 +6,7 @@ import Link from "next/link"
 
 export const revalidate = 0;
 
-interface Kata {
+interface Card {
   id: number
   title: string
   description: string
@@ -14,16 +14,17 @@ interface Kata {
 }
 
 interface PageProps {
+  params: { id: string },
   searchParams: { q?: string }
 }
 
 export default async function Page({ params, searchParams }: PageProps) {
   console.log('sdfdfds', params)
   const supabase = createServerComponentClient({
-    headers,
     cookies,
   })
-  let res
+
+  let res:any;
   if (searchParams.q) {
     res = await supabase
       .from("cards")
@@ -42,7 +43,7 @@ export default async function Page({ params, searchParams }: PageProps) {
       <h1 className="text-white text-xl mb-5">Card Library</h1>
       {/* <Search q={searchParams?.q} /> */}
       <div className="grid grid-rows-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {data?.map((card) => (
+        {data?.map((card:any) => (
           <Link
             key={card.id}
             href={`/cards/${card.id}`}
