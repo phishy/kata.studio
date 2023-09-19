@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import SelectPlaylist from "@/components/SelectPlaylist"
+import { useRouter } from "next/navigation"
 
 import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
 import { Switch } from "@/components/ui/switch"
 import ReactMarkdown from "react-markdown"
+
+import { message } from "antd"
 
 export const revalidate = 60
 
@@ -20,6 +23,10 @@ interface PageProps {
 }
 
 export default function CardForm({ params }: PageProps) {
+  let router = useRouter()
+  const [messageApi, contextHolder] = message.useMessage()
+
+  const [ isLoading, setIsLoading ] = useState<boolean>(false)
   const [card, setCard] = useState<any>({})
   const [code, setCode] = useState<any>("")
   const [codeView, setCodeView] = useState<boolean>(false)
@@ -43,6 +50,7 @@ export default function CardForm({ params }: PageProps) {
     let content = `In JavaScript, is this the correct answer to the question? Question: ${card.question}. Answer: ${code}`
     let messages = [{ role: "user", content }]
 
+    setIsLoading(true)
     let res = await fetch("/api/chat", {
       method: "POST",
       body: JSON.stringify({ messages }),
@@ -50,13 +58,33 @@ export default function CardForm({ params }: PageProps) {
         "Content-Type": "application/json",
       },
     })
+    setIsLoading(false)
 
     let response = await res.json()
     setAnswer(response.response)
   }
 
+  const doDelete = async () => {
+    let { error } = await supabase.from("cards").delete().eq("id", params.id)
+    if (error) {
+      let content = !error.code.length
+        ? "Network error. Unable to delete card."
+        : error.message
+      messageApi.open({
+        type: "error",
+        content,
+        style: {
+          marginTop: "20vh",
+        },
+      })
+    } else {
+      router.push("/cards")
+    }
+  }
+
   return (
     <div className="m-5">
+      {contextHolder}
       <div className="px-4 sm:px-0">
         <h3 className="text-base font-semibold leading-7 text-gray-900">
           {card.title}
@@ -83,7 +111,7 @@ export default function CardForm({ params }: PageProps) {
               {card.question}
             </dd>
           </div> */}
-          <SelectPlaylist card_id={params.id} />
+
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt className="text-sm font-medium leading-6 text-gray-900">
               Answer
@@ -115,13 +143,17 @@ export default function CardForm({ params }: PageProps) {
                 />
               )}
               <div className="flex gap-1">
-                <Button type="button" onClick={doCheck} className="mt-5">
+                <Button type="button" onClick={doCheck} className="mt-5" disabled={isLoading}>
                   Check
                 </Button>
-                <Button type="button" onClick={doCheck} className="mt-5">
+                {/* <Button type="button" onClick={doCheck} className="mt-5">
                   Save
+                </Button> */}
+                <Button type="button" onClick={doDelete} className="mt-5">
+                  Delete
                 </Button>
               </div>
+              <SelectPlaylist card_id={params.id} />
               <div className="mt-10">
                 {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
                 {answer.startsWith("Yes") && (
