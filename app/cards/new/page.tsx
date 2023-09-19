@@ -87,7 +87,6 @@ export default function NewCardForm() {
    * @param data The form data to be inserted into the "cards" table.
    */
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    debugger;
     let { error } = await supabase.from("cards").insert(data)
     if (error) {
       alert("error")
@@ -147,6 +146,7 @@ export default function NewCardForm() {
         <div className="flex gap-1">
           <Button
             type="button"
+            variant="secondary"
             disabled={generate.isLoading}
             onClick={(e) => {
               e.preventDefault()
@@ -155,7 +155,9 @@ export default function NewCardForm() {
           >
             Generate
           </Button>
-          <Button type="submit">Create</Button>
+          <Button type="submit" disabled={generate.isLoading}>
+            Create
+          </Button>
         </div>
       </form>
     </Form>

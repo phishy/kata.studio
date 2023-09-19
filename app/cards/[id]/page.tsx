@@ -5,8 +5,7 @@ import Editor from "@monaco-editor/react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { Textarea } from "@/components/ui/textarea"
-import AddToList from "@/components/AddToList"
-import Select from "@/components/select"
+import SelectPlaylist from "@/components/SelectPlaylist"
 
 import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
 import { Switch } from "@/components/ui/switch"
@@ -41,7 +40,6 @@ export default function CardForm({ params }: PageProps) {
   }, [params.id])
 
   async function doCheck() {
-    console.log("yooo", code)
     let content = `In JavaScript, is this the correct answer to the question? Question: ${card.question}. Answer: ${code}`
     let messages = [{ role: "user", content }]
 
@@ -85,6 +83,7 @@ export default function CardForm({ params }: PageProps) {
               {card.question}
             </dd>
           </div> */}
+          <SelectPlaylist card_id={params.id} />
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt className="text-sm font-medium leading-6 text-gray-900">
               Answer
@@ -123,8 +122,6 @@ export default function CardForm({ params }: PageProps) {
                   Save
                 </Button>
               </div>
-              {/* <AddToList /> */}
-              <Select />
               <div className="mt-10">
                 {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
                 {answer.startsWith("Yes") && (

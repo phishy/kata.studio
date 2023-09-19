@@ -23,11 +23,13 @@ export default async function Page({ params, searchParams }: PageProps) {
     cookies,
   })
 
-  let res: any
-  res = await supabase.from("lists").select("id,cards:*").limit(100)
+  // let { error, data } = await supabase.from("lists").select("*, cards_lists(*, cards(*))").limit(100)
+  let { error, data } = await supabase.from("lists").select("id,name").limit(100)
+  if (error) {
+    console.log(error);
+  }
 
-  let { data } = res
-  console.log("data", data)
+  console.log("data", JSON.stringify(data, null, 2))
 
   return (
     <div className="p-5 md:p-7 bg-black">
@@ -43,7 +45,7 @@ export default async function Page({ params, searchParams }: PageProps) {
           >
             <div className="w-full p-5">
               <div className="text-white text-xl font-bold mb-2">
-                {list.title}
+                {list.name}
               </div>
               <div className="text-gray-500">{list.description}</div>
             </div>

@@ -10,13 +10,11 @@ export const runtime = 'edge';
 
 export async function POST(req, res) {
   const { messages } = await req.json();
-  console.log('m', messages)
   const response = await openai.chat.completions.create({
     model: 'gpt-4',
     // stream: true,
     messages,
   });
-  console.log('yo', { response: response.choices[0].message.content })
   return NextResponse.json({ response: response.choices[0].message.content });
   // res.status(200).json({ response: response.content });
   // const stream = OpenAIStream(response);

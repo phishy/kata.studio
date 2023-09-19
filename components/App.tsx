@@ -6,6 +6,8 @@ import { WebContainer, FileSystemTree } from "@webcontainer/api"
 import Loader from "./components/Loader"
 import posthog from "posthog-js"
 
+import { Button, ConfigProvider, Input, Space, theme } from "antd"
+
 import {
   useQuery,
   useMutation,
@@ -107,11 +109,23 @@ function App({ children }: AppProps) {
   // }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <WebContainerContext.Provider value={{ webContainer, webContainerReady }}>
-        {children}
-      </WebContainerContext.Provider>
-    </QueryClientProvider>
+    <ConfigProvider
+      theme={{
+        // 1. Use dark algorithm
+        algorithm: theme.darkAlgorithm,
+
+        // 2. Combine dark algorithm and compact algorithm
+        // algorithm: [theme.darkAlgorithm, theme.compactAlgorithm],
+      }}
+    >
+      <QueryClientProvider client={queryClient}>
+        <WebContainerContext.Provider
+          value={{ webContainer, webContainerReady }}
+        >
+          {children}
+        </WebContainerContext.Provider>
+      </QueryClientProvider>
+    </ConfigProvider>
   )
 }
 
