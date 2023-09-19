@@ -15,17 +15,19 @@ function classNames(...classes) {
 export default function SubLayout(props) {
 
   const user = {
-    name: props.session.user.email,
-    email: props.session.user.email,
+    name: props.session?.user?.email,
+    email: props.session?.user?.email,
     imageUrl:
       "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
   }
+
   const navigation = [
     { name: "Kata", href: "/kata", current: true },
     { name: "Cards", href: "/cards", current: false },
     { name: "New Card", href: "/cards/new", current: false },
     { name: "Lists", href: "/lists", current: false },
   ]
+
   const userNavigation = [
     // { name: "Your Profile", href: "#" },
     // { name: "Settings", href: "#" },
