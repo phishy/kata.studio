@@ -26,7 +26,7 @@ export default function CardForm({ params }: PageProps) {
   let router = useRouter()
   const [messageApi, contextHolder] = message.useMessage()
 
-  const [ isLoading, setIsLoading ] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [card, setCard] = useState<any>({})
   const [code, setCode] = useState<any>("")
   const [codeView, setCodeView] = useState<boolean>(false)
@@ -143,7 +143,24 @@ export default function CardForm({ params }: PageProps) {
                 />
               )}
               <div className="flex gap-1">
-                <Button type="button" onClick={doCheck} className="mt-5" disabled={isLoading}>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    const synth = window.speechSynthesis;
+                    const utterance = new SpeechSynthesisUtterance(card.question)
+                    synth.speak(utterance)
+                  }}
+                  className="mt-5"
+                  disabled={isLoading}
+                >
+                  Speak
+                </Button>
+                <Button
+                  type="button"
+                  onClick={doCheck}
+                  className="mt-5"
+                  disabled={isLoading}
+                >
                   Check
                 </Button>
                 {/* <Button type="button" onClick={doCheck} className="mt-5">

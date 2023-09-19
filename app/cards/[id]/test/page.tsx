@@ -17,7 +17,6 @@ export default async function ServerComponent(props) {
   const { data: lists } = await supabase
     .from("lists")
     .select("*, cards_lists(*, cards(*))")
-  console.log("lists", lists)
 
   return (
     <div>

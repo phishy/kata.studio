@@ -52,8 +52,6 @@ const App: React.FC = (props) => {
       .insert({ list_id: val, card_id: props.card_id })
   }
 
-  console.log(items.map((item) => ({ label: item.name, value: item.id })))
-
   return (
     <Select
       style={{ width: 300 }}

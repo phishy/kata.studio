@@ -16,7 +16,6 @@ export default async function Layout(props) {
   const supabase = createServerComponentClient({ cookies })
 
   let res = await supabase.auth.getSession()
-  console.log(res)
 
   return <SubLayout {...props} session={res.data.session} />
 }

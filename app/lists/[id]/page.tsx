@@ -12,7 +12,6 @@ export default async function List(props) {
     .select("*, cards_lists(*, cards(*))")
     .eq("id", props.params.id)
     .single()
-  console.log("data", JSON.stringify(data, null, 2))
 
   return (
     <div className="p-10 bg-black">

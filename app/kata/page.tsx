@@ -37,7 +37,6 @@ export default async function Page({ searchParams }: PageProps) {
   }
 
   let { data } = res
-  console.log("data", data)
 
   return (
     <div className="p-5 md:p-7 bg-black">

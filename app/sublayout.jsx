@@ -40,8 +40,8 @@ export default function SubLayout(props) {
   ]
 
   return (
-    <html class="h-full bg-gray-100">
-      <body class="h-full">
+    <html className="h-full bg-black">
+      <body className="h-full">
         <div className="min-h-full">
           <Disclosure as="nav" className="bg-gray-900">
             {({ open }) => (
@@ -224,7 +224,7 @@ export default function SubLayout(props) {
               </h1>
             </div>
           </header> */}
-          <main>
+          <main className="bg-black">
             <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
               <App>{props.children}</App>
             </div>

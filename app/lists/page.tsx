@@ -29,8 +29,6 @@ export default async function Page({ params, searchParams }: PageProps) {
     console.log(error);
   }
 
-  console.log("data", JSON.stringify(data, null, 2))
-
   return (
     <div className="p-5 md:p-7 bg-black">
       <h1 className="text-white text-xl mb-5">List Library</h1>
