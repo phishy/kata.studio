@@ -7,6 +7,9 @@ import { Textarea } from "@/components/ui/textarea"
 import SelectPlaylist from "@/components/SelectPlaylist"
 import { useRouter } from "next/navigation"
 
+import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
+import {dark} from 'react-syntax-highlighter/dist/esm/styles/prism'
+
 import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
 import { Switch } from "@/components/ui/switch"
 import ReactMarkdown from "react-markdown"
@@ -22,7 +25,7 @@ export default function Answer(props) {
   const [code, setCode] = useState<any>("")
   const [codeView, setCodeView] = useState<boolean>(false)
   const [answer, setAnswer] = useState<string>("")
-  const [ showAnswer, setShowAnswer ] = useState<boolean>(false)
+  const [showAnswer, setShowAnswer] = useState<boolean>(false)
 
   async function doCheck() {
     let content = `In JavaScript, is this the correct answer to the question? Question: ${card.question}. Answer: ${code}`
@@ -153,12 +156,38 @@ export default function Answer(props) {
                 {/* <Button type="button" onClick={doCheck} className="mt-5">
                   Save
                 </Button> */}
-                <Button type="button" onClick={doDelete} className="mt-5 bg-zinc-900">
+                <Button
+                  type="button"
+                  onClick={doDelete}
+                  className="mt-5 bg-zinc-900"
+                >
                   Delete
                 </Button>
               </div>
               <SelectPlaylist card_id={card.id} />
-              { showAnswer && <div className="text-white">{card.answer}</div>}
+              {showAnswer && (
+                <ReactMarkdown
+                  children={card.answer}
+                  components={{
+                    code({ node, inline, className, children, ...props }) {
+                      const match = /language-(\w+)/.exec(className || "")
+                      return !inline && match ? (
+                        <SyntaxHighlighter
+                          {...props}
+                          children={String(children).replace(/\n$/, "")}
+                          style={dark}
+                          language={match[1]}
+                          PreTag="div"
+                        />
+                      ) : (
+                        <code {...props} className={className}>
+                          {children}
+                        </code>
+                      )
+                    },
+                  }}
+                />
+              )}
               <div className="mt-10">
                 {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
                 {answer.startsWith("Yes") && (
