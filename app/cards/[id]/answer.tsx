@@ -8,7 +8,7 @@ import SelectPlaylist from "@/components/SelectPlaylist"
 import { useRouter } from "next/navigation"
 
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
-import {dark} from 'react-syntax-highlighter/dist/esm/styles/prism'
+import {funky as theme } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
 import { Switch } from "@/components/ui/switch"
@@ -175,7 +175,7 @@ export default function Answer(props) {
                         <SyntaxHighlighter
                           {...props}
                           children={String(children).replace(/\n$/, "")}
-                          style={dark}
+                          style={theme}
                           language={match[1]}
                           PreTag="div"
                         />
