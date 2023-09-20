@@ -2,7 +2,7 @@
 
 import Editor from "@monaco-editor/react"
 import { Button } from "@/components/ui/button"
-import { useState, useEffect } from "react"
+import { useState, useRef } from "react"
 import { Textarea } from "@/components/ui/textarea"
 import SelectPlaylist from "@/components/SelectPlaylist"
 import { useRouter } from "next/navigation"
@@ -16,9 +16,10 @@ import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
 import { Switch } from "@/components/ui/switch"
 import ReactMarkdown from "react-markdown"
 
-import { message } from "antd"
+import { Alert, message } from "antd"
 
 export default function Answer(props) {
+  const monacoRef = useRef(null)
   const supabase = createClientComponentClient()
   let router = useRouter()
   const [messageApi, contextHolder] = message.useMessage()
@@ -26,11 +27,26 @@ export default function Answer(props) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [card, setCard] = useState<any>(props.card)
   const [code, setCode] = useState<any>("")
-  const [codeView, setCodeView] = useState<boolean>(false)
+  const [codeView, setCodeView] = useState<boolean>(card.type === "code")
   const [answer, setAnswer] = useState<string>("")
   const [showAnswer, setShowAnswer] = useState<boolean>(false)
+  const [ isErrors, setIsErrors ] = useState<any>(false)
+
+  function handleEditorDidMount(editor, monaco) {
+    // here is another way to get monaco instance
+    // you can also store it in `useRef` for further usage
+    monacoRef.current = monaco
+  }
 
   async function doCheck() {
+    console.log('markers', monacoRef.current.editor.getModelMarkers())
+    let isErrors = monacoRef.current.editor.getModelMarkers().length
+    setIsErrors(isErrors)
+    console.log('isErrors', isErrors)
+    if (isErrors) {
+      return false;
+    }
+
     let content = `In JavaScript, is this the correct answer to the question? Question: ${card.question}. Answer: ${code}`
     let messages = [{ role: "user", content }]
 
@@ -88,14 +104,24 @@ export default function Answer(props) {
             {card.difficulty}
           </span>
         )}
-        <h3 className="text-2xl text-base font-semibold leading-7 text-zinc-400">
+        {/* <h3 className="text-2xl text-base font-semibold leading-7 text-zinc-400">
           {card.question}
-        </h3>
+        </h3> */}
+        <div class="flex flex-col bg-zinc-800 shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:shadow-slate-700/[.7]">
+          <div class="p-4 md:p-10">
+            <h3 class="text-lg font-light  dark:text-white">{card.question}</h3>
+            {/* <p class="mt-2 text-gray-800 dark:text-gray-400">
+              With supporting text below as a natural lead-in to additional
+              content.
+            </p> */}
+          </div>
+        </div>
+        { isErrors ? <Alert message="Cannot submit with syntax errors" type="warning" className="mt-3" /> : null }
         {/* <p className="text-xl mt-1 max-w-2xl leading-6 text-gray-500">
           {card.question}
         </p> */}
       </div>
-      <div className="mt-6 border-gray-100">
+      <div className="border-gray-100">
         <dl className="divide-y divide-gray-100">
           {/* <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt className="text-sm font-medium leading-6 text-gray-900">
@@ -114,12 +140,13 @@ export default function Answer(props) {
             </dd>
           </div> */}
 
-          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-white">Answer</dt>
+          <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              <Switch onCheckedChange={(val) => setCodeView(val)} />
-              <div className="text-white">Code</div>
-              {!codeView && (
+              {/* <div>
+                <Switch onCheckedChange={(val) => setCodeView(val)} />
+                <span className="text-white">Code</span>
+              </div> */}
+              {!showAnswer && !codeView && (
                 <Textarea onChange={(val) => setCode(val.target.value)}>
                   {code}
                 </Textarea>
@@ -129,6 +156,7 @@ export default function Answer(props) {
                   key={codeView.toString()}
                   theme="vs-dark"
                   height="30vh"
+                  onMount={handleEditorDidMount}
                   defaultLanguage="javascript"
                   // defaultValue={card.answer}
                   onChange={(value) => {
@@ -194,29 +222,31 @@ export default function Answer(props) {
               </div>
               <SelectPlaylist card_id={card.id} />
               {showAnswer && (
-                <ReactMarkdown
-                  children={card.answer}
-                  components={{
-                    code({ node, inline, className, children, ...props }) {
-                      const match = /language-(\w+)/.exec(className || "")
-                      return !inline && match ? (
-                        <SyntaxHighlighter
-                          {...props}
-                          children={String(children).replace(/\n$/, "")}
-                          style={theme}
-                          language={match[1]}
-                          PreTag="div"
-                        />
-                      ) : (
-                        <code {...props} className={className}>
-                          {children}
-                        </code>
-                      )
-                    },
-                  }}
-                />
+                <div className="mt-5 text-white">
+                  <ReactMarkdown
+                    children={card.answer}
+                    components={{
+                      code({ node, inline, className, children, ...props }) {
+                        const match = /language-(\w+)/.exec(className || "")
+                        return !inline && match ? (
+                          <SyntaxHighlighter
+                            {...props}
+                            children={String(children).replace(/\n$/, "")}
+                            style={theme}
+                            language={match[1]}
+                            PreTag="div"
+                          />
+                        ) : (
+                          <code {...props} className={className}>
+                            {children}
+                          </code>
+                        )
+                      },
+                    }}
+                  />
+                </div>
               )}
-              <div className="mt-10">
+              <div className="mt-10 text-white">
                 {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
                 {answer.startsWith("Yes") && (
                   <HiCheckCircle size={50} color="green" />

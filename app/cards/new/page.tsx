@@ -37,6 +37,7 @@ export default function NewCardForm() {
 
   const generate = useMutation({
     mutationFn: async (question) => {
+
       let content = `In JavaScript, what is the answer to this question? Provide the response in the following format. { "answer": "", "difficulty": ""} . ${question}`
       let messages = [{ role: "user", content }]
 
@@ -50,7 +51,6 @@ export default function NewCardForm() {
 
       let response = await res.json()
       let { answer, difficulty } = JSON.parse(response.response);
-      debugger;
       form.setValue("answer", answer)
       form.setValue("difficulty", difficulty)
     },

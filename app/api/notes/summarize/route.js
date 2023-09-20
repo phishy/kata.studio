@@ -9,14 +9,13 @@ const openai = new OpenAI({
 export const runtime = "edge"
 
 export async function POST(req, res) {
-  const { messages } = await req.json()
+  const { notes } = await req.json()
 
-  // let content = `In JavaScript, what is the answer to this question? Provide the response in the following format. { "answer": "", "difficulty": ""} . ${question}`
-  // let messages = [{ role: "user", content }]
+  let content = `Please summarize these notes. Provide the response in the following format. { "summary": "" } . ${notes}`
+  let messages = [{ role: "user", content }]
 
   const response = await openai.chat.completions.create({
-    // model: "gpt-4",
-    model: "gpt-3.5-turbo",
+    model: "gpt-4",
     // stream: true,
     messages,
   })
