@@ -4,15 +4,20 @@ import App from "@/components/App"
 import Logo from "@/components/Logo"
 import Link from "next/link"
 
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+
 import { Fragment } from "react"
 import { Disclosure, Menu, Transition } from "@headlessui/react"
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline"
+import { useRouter } from "next/navigation"
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
 export default function SubLayout(props) {
+  let router = useRouter()
+  const supabase = createClientComponentClient()
 
   const user = {
     name: props.session?.user?.email,
@@ -28,6 +33,21 @@ export default function SubLayout(props) {
     { name: "Lists", href: "/lists", current: false },
   ]
 
+  if (props.session?.user) {
+    navigation.unshift({
+      name: "Logout",
+      href: "/logout",
+      current: false,
+      onClick: (e) => {
+        e.preventDefault();
+        supabase.auth.signOut()
+        router.refresh();
+      },
+    })
+  } else {
+    navigation.unshift({ name: "Login", href: "/login", current: true })
+  }
+
   const userNavigation = [
     // { name: "Your Profile", href: "#" },
     // { name: "Settings", href: "#" },
@@ -42,7 +62,7 @@ export default function SubLayout(props) {
   ]
 
   return (
-    <html className="h-full bg-black">
+    <html className="h-full">
       <body className="h-full">
         <div className="min-h-full">
           <Disclosure as="nav" className="bg-gray-900">
@@ -52,7 +72,9 @@ export default function SubLayout(props) {
                   <div className="flex h-16 items-center justify-between">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
-                        <Link href="/"><Logo /></Link>
+                        <Link href="/">
+                          <Logo />
+                        </Link>
                         {/* <img
                           className="h-8 w-8"
                           src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
@@ -64,7 +86,8 @@ export default function SubLayout(props) {
                           {navigation.map((item) => (
                             <Link
                               key={item.name}
-                              href={item.href}
+                              href={item.onClick ? '' : item.href}
+                              onClick={item.onClick}
                               className={classNames(
                                 item.current
                                   ? "bg-gray-900 text-white"
@@ -81,17 +104,17 @@ export default function SubLayout(props) {
                     </div>
                     <div className="hidden md:block">
                       <div className="ml-4 flex items-center md:ml-6">
-                        <button
+                        {/* <button
                           type="button"
                           className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                         >
                           <span className="absolute -inset-1.5" />
                           <span className="sr-only">View notifications</span>
                           <BellIcon className="h-6 w-6" aria-hidden="true" />
-                        </button>
+                        </button> */}
 
                         {/* Profile dropdown */}
-                        <Menu as="div" className="relative ml-3">
+                        {/* <Menu as="div" className="relative ml-3">
                           <div>
                             <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                               <span className="absolute -inset-1.5" />
@@ -131,7 +154,7 @@ export default function SubLayout(props) {
                               ))}
                             </Menu.Items>
                           </Transition>
-                        </Menu>
+                        </Menu> */}
                       </div>
                     </div>
                     <div className="-mr-2 flex md:hidden">
@@ -161,7 +184,8 @@ export default function SubLayout(props) {
                       <Disclosure.Button
                         key={item.name}
                         as="a"
-                        href={item.href}
+                        href={item.onClick ? '' : item.href}
+                        onClick={item.onClick}
                         className={classNames(
                           item.current
                             ? "bg-gray-900 text-white"
@@ -174,7 +198,7 @@ export default function SubLayout(props) {
                       </Disclosure.Button>
                     ))}
                   </div>
-                  <div className="border-t border-gray-700 pb-3 pt-4">
+                  {/* <div className="border-t border-gray-700 pb-3 pt-4">
                     <div className="flex items-center px-5">
                       <div className="flex-shrink-0">
                         <img
@@ -213,7 +237,7 @@ export default function SubLayout(props) {
                         </Disclosure.Button>
                       ))}
                     </div>
-                  </div>
+                  </div> */}
                 </Disclosure.Panel>
               </>
             )}
@@ -226,8 +250,8 @@ export default function SubLayout(props) {
               </h1>
             </div>
           </header> */}
-          <main className="bg-black">
-            <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <main>
+            <div className="mx-auto">
               <App>{props.children}</App>
             </div>
           </main>

@@ -86,7 +86,7 @@ export default function CardForm({ params }: PageProps) {
     <div className="m-5">
       {contextHolder}
       <div className="px-4 sm:px-0">
-        <h3 className="text-base font-semibold leading-7 text-gray-900">
+        <h3 className="text-base font-semibold leading-7 text-white">
           {card.title}
         </h3>
         <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-500">

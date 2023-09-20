@@ -40,7 +40,7 @@ export default async function Page({ searchParams }: PageProps) {
 
   return (
     <div className="p-5 md:p-7 bg-black">
-      <h1 className="text-xl mb-5">Library</h1>
+      <h1 className="text-xl mb-5 text-white">Library</h1>
       <Search q={searchParams?.q} />
       <div className="grid grid-rows-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {data?.map((kata) => (
