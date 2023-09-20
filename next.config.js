@@ -2,7 +2,9 @@
 const nextConfig = {}
 
 const withMDX = require("@next/mdx")()
+
 module.exports = withMDX({
+  extension: /\.mdx?$/,
   experimental: {
     mdxRs: true,
   },
