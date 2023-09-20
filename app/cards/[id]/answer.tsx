@@ -22,6 +22,7 @@ export default function Answer(props) {
   const [code, setCode] = useState<any>("")
   const [codeView, setCodeView] = useState<boolean>(false)
   const [answer, setAnswer] = useState<string>("")
+  const [ showAnswer, setShowAnswer ] = useState<boolean>(false)
 
   async function doCheck() {
     let content = `In JavaScript, is this the correct answer to the question? Question: ${card.question}. Answer: ${code}`
@@ -141,6 +142,14 @@ export default function Answer(props) {
                 >
                   Check
                 </Button>
+                <Button
+                  type="button"
+                  onClick={() => setShowAnswer(!showAnswer)}
+                  className="mt-5 bg-zinc-900"
+                  disabled={isLoading}
+                >
+                  Show Answer
+                </Button>
                 {/* <Button type="button" onClick={doCheck} className="mt-5">
                   Save
                 </Button> */}
@@ -149,6 +158,7 @@ export default function Answer(props) {
                 </Button>
               </div>
               <SelectPlaylist card_id={card.id} />
+              { showAnswer && <div className="text-white">{card.answer}</div>}
               <div className="mt-10">
                 {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
                 {answer.startsWith("Yes") && (
