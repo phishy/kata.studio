@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea"
 import SelectPlaylist from "@/components/SelectPlaylist"
 import { useRouter } from "next/navigation"
 
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { funky as theme } from "react-syntax-highlighter/dist/esm/styles/prism"
 
@@ -17,6 +19,7 @@ import ReactMarkdown from "react-markdown"
 import { message } from "antd"
 
 export default function Answer(props) {
+  const supabase = createClientComponentClient()
   let router = useRouter()
   const [messageApi, contextHolder] = message.useMessage()
 
@@ -61,6 +64,19 @@ export default function Answer(props) {
     } else {
       router.push("/cards")
     }
+  }
+
+  async function next() {
+    const { count } = await supabase
+      .from("cards")
+      .select("*", { count: "exact", head: true })
+    console.log("count", count)
+    let random = Math.floor(Math.random() * count - 1)
+    const { data } = await supabase
+      .from("cards")
+      .select("*")
+      .range(random, random + 1)
+    router.push(`/cards/${data[0].id}`)
   }
 
   return (
@@ -162,6 +178,13 @@ export default function Answer(props) {
                   className="mt-5 bg-zinc-900"
                 >
                   Delete
+                </Button>
+                <Button
+                  type="button"
+                  onClick={next}
+                  className="mt-5 bg-zinc-900"
+                >
+                  Next
                 </Button>
               </div>
               <SelectPlaylist card_id={card.id} />
