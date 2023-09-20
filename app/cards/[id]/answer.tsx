@@ -83,6 +83,11 @@ export default function Answer(props) {
     <div className="m-5">
       {contextHolder}
       <div className="px-4 sm:px-0">
+        {card.difficulty && (
+          <span className="mb-2 inline-flex items-center rounded-md bg-pink-400/10 px-2 py-1 text-xs font-medium text-pink-400 ring-1 ring-inset ring-pink-400/20">
+            {card.difficulty}
+          </span>
+        )}
         <h3 className="text-2xl text-base font-semibold leading-7 text-zinc-400">
           {card.question}
         </h3>

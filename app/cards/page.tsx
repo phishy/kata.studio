@@ -27,13 +27,13 @@ export default async function Page({ params, searchParams }: PageProps) {
   if (searchParams.q) {
     res = await supabase
       .from("cards")
-      .select("id,title,question")
+      .select("id,title,difficulty,question")
       .or(
         `title.ilike."%${searchParams.q}%",question.ilike."%${searchParams.q}%",answer.ilike."%${searchParams.q}%"`
       )
       .limit(100)
   } else {
-    res = await supabase.from("cards").select("id,title,question").limit(100)
+    res = await supabase.from("cards").select("id,title,difficulty,question").limit(100)
   }
 
   let { data } = res
@@ -57,10 +57,10 @@ export default async function Page({ params, searchParams }: PageProps) {
                 </span>
               )}
 
-              <div className="text-white text-xl font-bold mb-2">
+              <div className="text-white mb-2">
                 {card.title}
               </div>
-              <div className="text-gray-500">{card.description}</div>
+              {/* <div className="text-gray-500">{card.description}</div> */}
             </div>
           </Link>
         ))}

@@ -28,6 +28,7 @@ const FormSchema = z.object({
   title: z.string(),
   question: z.string(),
   answer: z.string().optional(),
+  difficulty: z.string().optional(),
 })
 
 export default function NewCardForm() {
@@ -36,7 +37,7 @@ export default function NewCardForm() {
 
   const generate = useMutation({
     mutationFn: async (question) => {
-      let content = `In JavaScript, what is the answer to this question? ${question}`
+      let content = `In JavaScript, what is the answer to this question? Provide the response in the following format. { "answer": "", "difficulty": ""} . ${question}`
       let messages = [{ role: "user", content }]
 
       let res = await fetch("/api/chat", {
@@ -48,8 +49,10 @@ export default function NewCardForm() {
       })
 
       let response = await res.json()
-      form.setValue("answer", response.response)
-      // return response.response
+      let { answer, difficulty } = JSON.parse(response.response);
+      debugger;
+      form.setValue("answer", answer)
+      form.setValue("difficulty", difficulty)
     },
   })
   console.log("generate", generate)
