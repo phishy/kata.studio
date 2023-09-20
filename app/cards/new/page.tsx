@@ -109,6 +109,7 @@ export default function NewCardForm() {
               <FormLabel>Title</FormLabel>
               <FormControl>
                 <Input {...field} onChange={(e) => {
+                  form.setValue("title", e.target.value)
                   form.setValue("question", e.target.value)
                 }} />
               </FormControl>
