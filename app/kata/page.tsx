@@ -2,7 +2,7 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies, headers } from "next/headers"
 import Link from "next/link"
 
-import Search from "./Search"
+import Search from "@/components/Search"
 
 export const revalidate = 1
 
@@ -41,7 +41,7 @@ export default async function Page({ searchParams }: PageProps) {
   return (
     <div className="p-5 md:p-7 bg-black">
       <h1 className="text-xl mb-5 text-white">Library</h1>
-      <Search q={searchParams?.q} />
+      <Search type="kata" q={searchParams?.q} />
       <div className="grid grid-rows-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {data?.map((kata) => (
           <Link

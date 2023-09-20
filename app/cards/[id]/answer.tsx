@@ -7,8 +7,8 @@ import { Textarea } from "@/components/ui/textarea"
 import SelectPlaylist from "@/components/SelectPlaylist"
 import { useRouter } from "next/navigation"
 
-import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
-import {funky as theme } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
+import { funky as theme } from "react-syntax-highlighter/dist/esm/styles/prism"
 
 import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
 import { Switch } from "@/components/ui/switch"
@@ -193,7 +193,27 @@ export default function Answer(props) {
                 {answer.startsWith("Yes") && (
                   <HiCheckCircle size={50} color="green" />
                 )}
-                <ReactMarkdown children={answer} />
+                <ReactMarkdown
+                  children={answer}
+                  components={{
+                    code({ node, inline, className, children, ...props }) {
+                      const match = /language-(\w+)/.exec(className || "")
+                      return !inline && match ? (
+                        <SyntaxHighlighter
+                          {...props}
+                          children={String(children).replace(/\n$/, "")}
+                          style={theme}
+                          language={match[1]}
+                          PreTag="div"
+                        />
+                      ) : (
+                        <code {...props} className={className}>
+                          {children}
+                        </code>
+                      )
+                    },
+                  }}
+                />
               </div>
             </dd>
           </div>

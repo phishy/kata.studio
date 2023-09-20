@@ -2,13 +2,13 @@
 
 import { useRouter } from "next/navigation"
 
-export default function Search({ q }) {
+export default function Search({ q, type }) {
   const router = useRouter()
 
   const handleSubmit = (e: any) => {
     e.preventDefault()
     const q = e.target.q.value
-    router.push(`/kata?q=${q}`)
+    router.push(`/${type}?q=${q}`)
   }
 
   return (

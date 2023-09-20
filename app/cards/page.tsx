@@ -2,9 +2,9 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies, headers } from "next/headers"
 import Link from "next/link"
 
-// import Search from "./Search"
+import Search from "@/components/Search"
 
-export const revalidate = 0;
+export const revalidate = 0
 
 interface Card {
   id: number
@@ -14,7 +14,7 @@ interface Card {
 }
 
 interface PageProps {
-  params: { id: string },
+  params: { id: string }
   searchParams: { q?: string }
 }
 
@@ -23,12 +23,14 @@ export default async function Page({ params, searchParams }: PageProps) {
     cookies,
   })
 
-  let res:any;
+  let res: any
   if (searchParams.q) {
     res = await supabase
       .from("cards")
       .select("id,title,question")
-      // .or(`title.ilike."%${searchParams.q}%",description.ilike."%${searchParams.q}%"`)
+      .or(
+        `title.ilike."%${searchParams.q}%",question.ilike."%${searchParams.q}%",answer.ilike."%${searchParams.q}%"`
+      )
       .limit(100)
   } else {
     res = await supabase.from("cards").select("id,title,question").limit(100)
@@ -39,9 +41,9 @@ export default async function Page({ params, searchParams }: PageProps) {
   return (
     <div className="p-5 md:p-7 bg-black">
       <h1 className="text-white text-xl mb-5">Card Library</h1>
-      {/* <Search q={searchParams?.q} /> */}
+      <Search type="cards" q={searchParams?.q} />
       <div className="grid grid-rows-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {data?.map((card:any) => (
+        {data?.map((card: any) => (
           <Link
             key={card.id}
             href={`/cards/${card.id}`}
