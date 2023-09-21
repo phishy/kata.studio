@@ -28,6 +28,7 @@ export default function SubLayout(props) {
   }
 
   const navigation = [
+    { name: "JS Reference", href: "/reference", current: true },
     { name: "Kata", href: "/kata", current: true },
     { name: "Cards", href: "/cards", current: false },
     { name: "New Card", href: "/cards/new", current: false },
@@ -73,7 +74,7 @@ export default function SubLayout(props) {
           <Disclosure as="nav" className="bg-gray-900">
             {({ open }) => (
               <>
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="flex h-16 items-center justify-between">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
