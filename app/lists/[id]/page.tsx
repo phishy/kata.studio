@@ -14,7 +14,7 @@ export default async function List(props) {
     .single()
 
   return (
-    <div className="p-10 bg-black">
+    <div className="m-5">
       <div className="text-3xl text-white mb-5">{data.name}</div>
 
       <div className="grid grid-rows-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
