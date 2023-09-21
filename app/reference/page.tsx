@@ -1,6 +1,3 @@
-"use client"
-
-// import Reference from '@/app/md/js/reference.mdx'
 import Link from "next/link"
 
 let arrayMethods = [
