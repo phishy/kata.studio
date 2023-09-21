@@ -7,6 +7,7 @@ module.exports = withMDX({
   extension: /\.mdx?$/,
   experimental: {
     mdxRs: true,
+    serverActions: true,
   },
   // reactStrictMode: false,
   eslint: {

@@ -7,23 +7,34 @@ import { Textarea } from "@/components/ui/textarea"
 import SelectPlaylist from "@/components/SelectPlaylist"
 import { useRouter } from "next/navigation"
 
+import { useChat } from "ai/react"
+
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { funky as theme } from "react-syntax-highlighter/dist/esm/styles/prism"
 
 import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
-import { Switch } from "@/components/ui/switch"
 import ReactMarkdown from "react-markdown"
 
 import { Alert, message } from "antd"
 
 export default function Answer(props) {
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    append,
+    setMessages,
+  } = useChat()
+
   const monacoRef = useRef(null)
   const supabase = createClientComponentClient()
   let router = useRouter()
   const [messageApi, contextHolder] = message.useMessage()
 
+  const [followup, setFollowup] = useState<string>("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [card, setCard] = useState<any>(props.card)
   const [code, setCode] = useState<any>("")
@@ -33,12 +44,17 @@ export default function Answer(props) {
   const [isErrors, setIsErrors] = useState<any>(false)
 
   function handleEditorDidMount(editor, monaco) {
-    // here is another way to get monaco instance
-    // you can also store it in `useRef` for further usage
     monacoRef.current = monaco
   }
 
-  async function doCheck() {
+  function doHandleInputChange(e) {
+    setFollowup(e.target.value)
+    handleInputChange(e)
+  }
+
+  async function doCheck(e) {
+    e.preventDefault()
+
     if (card.type === "code") {
       console.log("markers", monacoRef.current.editor.getModelMarkers())
       let isErrors = monacoRef.current.editor.getModelMarkers().length
@@ -49,21 +65,11 @@ export default function Answer(props) {
       }
     }
 
-    let content = `In JavaScript, is this the correct answer to the question? Question: ${card.question}. Answer: ${code}`
-    let messages = [{ role: "user", content }]
-
-    setIsLoading(true)
-    let res = await fetch("/api/chat", {
-      method: "POST",
-      body: JSON.stringify({ messages }),
-      headers: {
-        "Content-Type": "application/json",
-      },
+    append({
+      role: "user",
+      content: `In JavaScript, is this the correct answer to the question? Question: ${card.question}. Answer: ${e.target.answer.value}. If not, show the correct answer.`,
     })
-    setIsLoading(false)
 
-    let response = await res.json()
-    setAnswer(response.response)
   }
 
   const doDelete = async () => {
@@ -109,9 +115,11 @@ export default function Answer(props) {
         {/* <h3 className="text-2xl text-base font-semibold leading-7 text-zinc-400">
           {card.question}
         </h3> */}
-        <div class="flex flex-col bg-zinc-800 shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:shadow-slate-700/[.7]">
-          <div class="p-4 md:p-10">
-            <h3 class="text-lg font-light  dark:text-white">{card.question}</h3>
+        <div className="flex flex-col bg-zinc-800 shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:shadow-slate-700/[.7]">
+          <div className="p-4 md:p-10">
+            <h3 className="text-lg font-light  dark:text-white">
+              {card.question}
+            </h3>
             {/* <p class="mt-2 text-gray-800 dark:text-gray-400">
               With supporting text below as a natural lead-in to additional
               content.
@@ -131,103 +139,68 @@ export default function Answer(props) {
       </div>
       <div className="border-gray-100">
         <dl className="divide-y divide-gray-100">
-          {/* <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
-              Title
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {card.title}
-            </dd>
-          </div> */}
-          {/* <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
-              Question
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {card.question}
-            </dd>
-          </div> */}
-
           <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {/* <div>
-                <Switch onCheckedChange={(val) => setCodeView(val)} />
-                <span className="text-white">Code</span>
-              </div> */}
-              {!showAnswer && !codeView && (
-                <Textarea onChange={(val) => setCode(val.target.value)}>
-                  {code}
-                </Textarea>
-              )}
-              {codeView && (
-                <Editor
-                  key={codeView.toString()}
-                  theme="vs-dark"
-                  height="30vh"
-                  onMount={handleEditorDidMount}
-                  defaultLanguage="javascript"
-                  // defaultValue={card.answer}
-                  onChange={(value) => {
-                    // console.log("value", value)
-                    setCode(value)
-                  }}
-                  // onMount={handleEditorDidMount}
-                  options={{
-                    minimap: {
-                      enabled: false,
-                    },
-                  }}
-                />
-              )}
-              <div className="flex gap-1 mb-4">
-                {/* <Button
-                  type="button"
-                  onClick={() => {
-                    const synth = window.speechSynthesis
-                    const utterance = new SpeechSynthesisUtterance(
-                      card.question
-                    )
-                    synth.speak(utterance)
-                  }}
-                  className="mt-5"
-                  disabled={isLoading}
-                >
-                  Speak
-                </Button> */}
-                <Button
-                  type="button"
-                  onClick={doCheck}
-                  className="mt-5 bg-zinc-900"
-                  disabled={isLoading}
-                >
-                  Check
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => setShowAnswer(!showAnswer)}
-                  className="mt-5 bg-zinc-900"
-                  disabled={isLoading}
-                >
-                  Show Answer
-                </Button>
-                {/* <Button type="button" onClick={doCheck} className="mt-5">
-                  Save
-                </Button> */}
-                <Button
-                  type="button"
-                  onClick={doDelete}
-                  className="mt-5 bg-zinc-900"
-                >
-                  Delete
-                </Button>
-                <Button
-                  type="button"
-                  onClick={next}
-                  className="mt-5 bg-zinc-900"
-                >
-                  Next
-                </Button>
-              </div>
+              <form onSubmit={doCheck}>
+                {!messages.length && !showAnswer && !codeView && (
+                  <Textarea
+                    name="answer"
+                    onChange={handleInputChange}
+                    value={input}
+                  ></Textarea>
+                )}
+                {codeView && (
+                  <>
+                    <input type="hidden" name="answer" value={code} />
+                    <Editor
+                      key={codeView.toString()}
+                      theme="vs-dark"
+                      height="30vh"
+                      onMount={handleEditorDidMount}
+                      defaultLanguage="javascript"
+                      onChange={(value) => {
+                        setCode(value)
+                      }}
+                      options={{
+                        minimap: {
+                          enabled: false,
+                        },
+                      }}
+                    />
+                  </>
+                )}
+                <div className="flex gap-1 mb-4">
+                  <Button
+                    type="submit"
+                    className="mt-5 bg-zinc-900"
+                    disabled={isLoading}
+                  >
+                    Check
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => setShowAnswer(!showAnswer)}
+                    className="mt-5 bg-zinc-900"
+                    disabled={isLoading}
+                  >
+                    Show Answer
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={doDelete}
+                    className="mt-5 bg-zinc-900"
+                  >
+                    Delete
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={next}
+                    className="mt-5 bg-zinc-900"
+                  >
+                    Next
+                  </Button>
+                </div>
+              </form>
               <SelectPlaylist card_id={card.id} />
               {showAnswer && (
                 <div className="mt-5 text-white">
@@ -259,27 +232,54 @@ export default function Answer(props) {
                 {answer.startsWith("Yes") && (
                   <HiCheckCircle size={50} color="green" />
                 )}
-                <ReactMarkdown
-                  children={answer}
-                  components={{
-                    code({ node, inline, className, children, ...props }) {
-                      const match = /language-(\w+)/.exec(className || "")
-                      return !inline && match ? (
-                        <SyntaxHighlighter
-                          {...props}
-                          children={String(children).replace(/\n$/, "")}
-                          style={theme}
-                          language={match[1]}
-                          PreTag="div"
-                        />
-                      ) : (
-                        <code {...props} className={className}>
-                          {children}
-                        </code>
-                      )
-                    },
-                  }}
-                />
+                {messages.length
+                  ? messages.slice(1).map((m) => (
+                      <ReactMarkdown
+                        key={m.id}
+                        children={m.content}
+                        components={{
+                          code({
+                            node,
+                            inline,
+                            className,
+                            children,
+                            ...props
+                          }) {
+                            const match = /language-(\w+)/.exec(className || "")
+                            return !inline && match ? (
+                              <SyntaxHighlighter
+                                {...props}
+                                children={String(children).replace(/\n$/, "")}
+                                style={theme}
+                                language={match[1]}
+                                PreTag="div"
+                              />
+                            ) : (
+                              <code {...props} className={className}>
+                                {children}
+                              </code>
+                            )
+                          },
+                        }}
+                      />
+                    ))
+                  : null}
+                {messages.length ? (
+                  <form
+                    onSubmit={(e) => {
+                      setFollowup("")
+                      doCheck(e)
+                    }}
+                  >
+                    <input
+                      name="answer"
+                      value={followup}
+                      className="text-white bg-black mt-5 p-2 border rounded-lg"
+                      placeholder="Say something..."
+                      onChange={doHandleInputChange}
+                    />
+                  </form>
+                ) : null}
               </div>
             </dd>
           </div>
