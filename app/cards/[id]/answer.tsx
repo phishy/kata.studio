@@ -30,7 +30,7 @@ export default function Answer(props) {
   const [codeView, setCodeView] = useState<boolean>(card.type === "code")
   const [answer, setAnswer] = useState<string>("")
   const [showAnswer, setShowAnswer] = useState<boolean>(false)
-  const [ isErrors, setIsErrors ] = useState<any>(false)
+  const [isErrors, setIsErrors] = useState<any>(false)
 
   function handleEditorDidMount(editor, monaco) {
     // here is another way to get monaco instance
@@ -39,12 +39,14 @@ export default function Answer(props) {
   }
 
   async function doCheck() {
-    console.log('markers', monacoRef.current.editor.getModelMarkers())
-    let isErrors = monacoRef.current.editor.getModelMarkers().length
-    setIsErrors(isErrors)
-    console.log('isErrors', isErrors)
-    if (isErrors) {
-      return false;
+    if (card.type === "code") {
+      console.log("markers", monacoRef.current.editor.getModelMarkers())
+      let isErrors = monacoRef.current.editor.getModelMarkers().length
+      setIsErrors(isErrors)
+      console.log("isErrors", isErrors)
+      if (isErrors) {
+        return false
+      }
     }
 
     let content = `In JavaScript, is this the correct answer to the question? Question: ${card.question}. Answer: ${code}`
@@ -116,7 +118,13 @@ export default function Answer(props) {
             </p> */}
           </div>
         </div>
-        { isErrors ? <Alert message="Cannot submit with syntax errors" type="warning" className="mt-3" /> : null }
+        {isErrors ? (
+          <Alert
+            message="Cannot submit with syntax errors"
+            type="warning"
+            className="mt-3"
+          />
+        ) : null}
         {/* <p className="text-xl mt-1 max-w-2xl leading-6 text-gray-500">
           {card.question}
         </p> */}
