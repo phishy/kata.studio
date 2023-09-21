@@ -6,17 +6,24 @@ import { Textarea } from "@/components/ui/textarea"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Alert } from "antd"
 
 import { useChat } from "ai/react"
 import { createCard } from "@/app/actions"
 
+import { experimental_useFormStatus as useFormStatus } from "react-dom"
+
 export default function NewCardForm() {
-  const [ isGenerating, setIsGenerating ] = useState<boolean>(false)
+  const { pending } = useFormStatus()
+  const [isGenerating, setIsGenerating] = useState<boolean>(false)
+  const [errorMessage, setErrorMessage] = useState<string>("")
+  const [ difficulty, setDifficulty ] = useState<string>(null)
   const [answer, setAnswer] = useState<string>("")
   const { messages, input, handleInputChange, append } = useChat({
     onFinish: (messages) => {
       setIsGenerating(false)
       setAnswer(JSON.parse(messages.content).answer)
+      setDifficulty(JSON.parse(messages.content).difficulty)
     },
   })
 
@@ -27,7 +34,15 @@ export default function NewCardForm() {
       e.preventDefault()
       doGenerate(e)
     } else if (submitButton.name === "save") {
-      return true;
+      return true
+    }
+  }
+
+  async function handleCreate(formData: FormData) {
+    const res = await createCard(formData)
+    console.log('yo', res)
+    if (res.error) {
+      setErrorMessage(res.error)
     }
   }
 
@@ -41,9 +56,11 @@ export default function NewCardForm() {
   }
 
   return (
-    <form action={createCard} onSubmit={handleSubmit} className="m-5">
+    <form action={handleCreate} onSubmit={handleSubmit} className="m-5">
+      <input type="hidden" value={difficulty} name="difficulty" />
       <label>Title</label>
       <Input
+        required
         value={input}
         name="title"
         className="text-white bg-black m-5"
@@ -52,6 +69,7 @@ export default function NewCardForm() {
       />
       <label>Question</label>
       <Textarea
+        required
         value={input}
         name="question"
         className="text-white bg-black m-5"
@@ -70,10 +88,14 @@ export default function NewCardForm() {
           {m.role}: {m.content}
         </div>
       ))} */}
+      {errorMessage ? (
+        <Alert message={errorMessage} type="warning" />
+        // <Alert message="An error occurred, please try again." type="warning" className="mb-5" />
+      ) : null}
       <Button name="generate" type="submit" disabled={isGenerating}>
-        { isGenerating ? "Generating..." : "Generate"}
+        {isGenerating ? "Generating..." : "Generate"}
       </Button>
-      <Button name="save" type="submit" disabled={isGenerating}>
+      <Button name="save" type="submit" disabled={isGenerating || pending}>
         Save
       </Button>
     </form>
