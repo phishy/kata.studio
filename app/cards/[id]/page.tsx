@@ -17,22 +17,22 @@ type Props = {
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
-// export async function generateMetadata(
-//   { params, searchParams }: Props,
-//   parent: ResolvingMetadata
-// ): Promise<Metadata> {
-//   const supabase = createServerComponentClient({ cookies })
-//   let { error, data: card } = await supabase
-//     .from("cards")
-//     .select("*")
-//     .eq("id", params.id)
-//     .single()
+export async function generateMetadata(
+  { params, searchParams }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const supabase = createServerComponentClient({ cookies })
+  let { error, data: card } = await supabase
+    .from("cards")
+    .select("*")
+    .eq("id", params.id)
+    .single()
 
-//   return {
-//     title: `${card.title} - kata.studio`,
-//     description: `${card.question}`,
-//   }
-// }
+  return {
+    title: `${card.title} - kata.studio`,
+    description: `${card.question}`,
+  }
+}
 
 export default async function CardForm({ params }: PageProps) {
   const supabase = createServerComponentClient({ cookies })
