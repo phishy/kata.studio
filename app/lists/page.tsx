@@ -1,8 +1,8 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies, headers } from "next/headers"
+import { cookies } from "next/headers"
 import Link from "next/link"
 
-// import Search from "./Search"
+import Search from "@/components/Search"
 
 export const revalidate = 0
 
@@ -23,16 +23,26 @@ export default async function Page({ params, searchParams }: PageProps) {
     cookies,
   })
 
-  // let { error, data } = await supabase.from("lists").select("*, cards_lists(*, cards(*))").limit(100)
-  let { error, data } = await supabase.from("lists").select("id,name").limit(100)
-  if (error) {
-    console.log(error);
+  let res;
+  if (searchParams.q) {
+    res = await supabase
+      .from("lists")
+      .select("id,name")
+      .or(`name.ilike."%${searchParams.q}%"`)
+      .limit(100)
+  } else {
+    res = await supabase
+      .from("lists")
+      .select("id,name")
+      .limit(100)
   }
+
+  let { data } = res
 
   return (
     <div className="p-5 md:p-7 bg-black">
       <h1 className="text-white text-xl mb-5">List Library</h1>
-      {/* <Search q={searchParams?.q} /> */}
+      <Search type="lists" q={searchParams?.q} />
       <div className="grid grid-rows-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {data?.map((list: any) => (
           <Link
