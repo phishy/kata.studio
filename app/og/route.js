@@ -2,6 +2,8 @@ import { ImageResponse } from "next/server"
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 
+// import Logo from '@/components/Logo'
+
 export const runtime = "edge"
 
 export async function GET(request) {
@@ -10,7 +12,6 @@ export async function GET(request) {
 
   const supabase = createRouteHandlerClient({ cookies })
   const { data: card } = await supabase.from('cards').select().eq('id', id).single()
-  console.log(card);
   return new ImageResponse(
     (
       <div tw="flex flex-col w-full h-full items-center justify-center bg-white">
