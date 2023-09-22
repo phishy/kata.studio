@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/server"
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+// import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 
 export const runtime = "edge"
@@ -13,7 +14,8 @@ export const size = {
 export const contentType = "image/png"
 
 export default async function Image(props) {
-  const supabase = createRouteHandlerClient({ cookies })
+
+  const supabase = createServerComponentClient({ cookies })
   const res = await supabase
     .from("cards")
     .select("*")
