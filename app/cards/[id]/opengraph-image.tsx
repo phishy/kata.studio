@@ -3,7 +3,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 // import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 
-export const runtime = "edge"
+// export const runtime = "edge"
 
 export const alt = "kata.studio"
 export const size = {
