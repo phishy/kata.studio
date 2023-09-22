@@ -30,10 +30,7 @@ export async function generateMetadata(
 
   return {
     title: `${card.title} - kata.studio`,
-    description: `${card.question}`,
-    openGraph: {
-      images: [`/og?id=${card.id}`]
-    }
+    description: `${card.question}`
   }
 }
 
