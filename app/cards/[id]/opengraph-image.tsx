@@ -4,7 +4,7 @@ import { cookies } from "next/headers"
 
 export const runtime = "edge"
 
-export const alt = "About Acme"
+export const alt = "kata.studio"
 export const size = {
   width: 1200,
   height: 630,
@@ -14,11 +14,12 @@ export const contentType = "image/png"
 
 export default async function Image(props) {
   const supabase = createRouteHandlerClient({ cookies })
-  const { data: card } = await supabase
+  const res  = await supabase
     .from("cards")
     .select()
     .eq("id", props.params.id)
     .single()
+  console.log(res)
 
   // Font
   // const interSemiBold = fetch(
@@ -31,7 +32,7 @@ export default async function Image(props) {
         <div tw="bg-gray-50 flex w-full">
           <div tw="flex flex-col md:flex-row w-full py-12 px-4 md:items-center justify-between p-8">
             <h2 tw="flex flex-col text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 text-left">
-              <span>{card.title}</span>
+              <span>{res.card.title}</span>
               <span tw="text-indigo-600">Learn JavaScript @ kata.studio</span>
             </h2>
             <div tw="mt-8 flex md:mt-0">
