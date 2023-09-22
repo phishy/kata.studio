@@ -32,7 +32,7 @@ export async function generateMetadata(
     title: `${card.title} - kata.studio`,
     description: `${card.question}`,
     openGraph: {
-      images: ['/og']
+      images: [`/og?id=${card.id}`]
     }
   }
 }
