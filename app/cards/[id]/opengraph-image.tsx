@@ -14,9 +14,9 @@ export const contentType = "image/png"
 
 export default async function Image(props) {
   const supabase = createRouteHandlerClient({ cookies })
-  const res  = await supabase
+  const res = await supabase
     .from("cards")
-    .select()
+    .select("*")
     .eq("id", props.params.id)
     .single()
   console.log(res)
