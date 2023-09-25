@@ -54,7 +54,12 @@ export default function Answer(props) {
 
   async function doCheck(e) {
     e.preventDefault()
+    
+    if (messages.length) {
+      setMessages([])
+    }
 
+  
     if (card.type === "code") {
       console.log("markers", monacoRef.current.editor.getModelMarkers())
       let isErrors = monacoRef.current.editor.getModelMarkers().length
@@ -64,6 +69,8 @@ export default function Answer(props) {
         return false
       }
     }
+
+
 
     append({
       role: "user",
@@ -149,6 +156,7 @@ export default function Answer(props) {
                     value={input}
                   ></Textarea>
                 )}
+
                 {codeView && (
                   <>
                     <input type="hidden" name="answer" value={code} />
@@ -169,6 +177,7 @@ export default function Answer(props) {
                     />
                   </>
                 )}
+
                 <div className="flex gap-1 mb-4">
                   <Button
                     type="submit"
