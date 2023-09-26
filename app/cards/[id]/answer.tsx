@@ -14,7 +14,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { funky as theme } from "react-syntax-highlighter/dist/esm/styles/prism"
 
-// import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
+// import { HiXCircle, HiCheckCircle } from "react-icons/hi2";
 import ReactMarkdown from "react-markdown"
 
 import { Alert, message } from "antd"
@@ -27,7 +27,7 @@ export default function Answer(props) {
     handleSubmit,
     append,
     setMessages,
-  } = useChat()
+  } = useChat();
 
   const monacoRef = useRef(null)
   const supabase = createClientComponentClient()
@@ -83,14 +83,14 @@ export default function Answer(props) {
 
   async function handleClearMessages() {
     setMessages([])
-  }
+    }
 
   const doDelete = async () => {
     let { error } = await supabase.from("cards").delete().eq("id", card.id)
     if (error) {
       let content = !error.code.length
         ? "Network error. Unable to delete card."
-        : error.message
+        : error.message;
       messageApi.open({
         type: "error",
         content,
@@ -101,14 +101,14 @@ export default function Answer(props) {
     } else {
       router.push("/cards")
     }
-  }
+  };
 
   async function next() {
     const { count } = await supabase
       .from("cards")
       .select("*", { count: "exact", head: true })
     console.log("count", count)
-    let random = Math.floor(Math.random() * count - 1)
+    let random = Math.floor(Math.random() * count - 1);
     const { data } = await supabase
       .from("cards")
       .select("*")
@@ -175,7 +175,7 @@ export default function Answer(props) {
                       onMount={handleEditorDidMount}
                       defaultLanguage="javascript"
                       onChange={(value) => {
-                        setCode(value)
+                        setCode(value);
                       }}
                       options={{
                         minimap: {
@@ -225,7 +225,7 @@ export default function Answer(props) {
                     children={card.answer}
                     components={{
                       code({ node, inline, className, children, ...props }) {
-                        const match = /language-(\w+)/.exec(className || "")
+                        const match = /language-(\w+)/.exec(className || "");
                         return !inline && match ? (
                           <SyntaxHighlighter
                             {...props}
@@ -244,6 +244,7 @@ export default function Answer(props) {
                   />
                 </div>
               )}
+
 
               <div className="mt-10 text-white">
                 {/* {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
@@ -314,5 +315,5 @@ export default function Answer(props) {
         </dl>
       </div>
     </div>
-  )
+  );
 }
