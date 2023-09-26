@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
-import Editor from "@monaco-editor/react"
-import { Button } from "@/components/ui/button"
-import { useState, useRef } from "react"
-import { Textarea } from "@/components/ui/textarea"
-import SelectPlaylist from "@/components/SelectPlaylist"
-import { useRouter } from "next/navigation"
+import Editor from "@monaco-editor/react";
+import { Button } from "@/components/ui/button";
+import { useState, useRef } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import SelectPlaylist from "@/components/SelectPlaylist";
+import { useRouter } from "next/navigation";
 
-import { useChat } from "ai/react"
+import { useChat } from "ai/react";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
-import { funky as theme } from "react-syntax-highlighter/dist/esm/styles/prism"
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { funky as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
-import ReactMarkdown from "react-markdown"
+import { HiXCircle, HiCheckCircle } from "react-icons/hi2";
+import ReactMarkdown from "react-markdown";
 
-import { Alert, message } from "antd"
+import { Alert, message } from "antd";
 
 export default function Answer(props) {
   const {
@@ -27,81 +27,99 @@ export default function Answer(props) {
     handleSubmit,
     append,
     setMessages,
-  } = useChat()
+  } = useChat();
 
-  const monacoRef = useRef(null)
-  const supabase = createClientComponentClient()
-  let router = useRouter()
-  const [messageApi, contextHolder] = message.useMessage()
+  const monacoRef = useRef(null);
+  const supabase = createClientComponentClient();
+  let router = useRouter();
+  const [messageApi, contextHolder] = message.useMessage();
 
-  const [followup, setFollowup] = useState<string>("")
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [card, setCard] = useState<any>(props.card)
-  const [code, setCode] = useState<any>("")
-  const [codeView, setCodeView] = useState<boolean>(card.type === "code")
-  const [answer, setAnswer] = useState<string>("")
-  const [showAnswer, setShowAnswer] = useState<boolean>(false)
-  const [isErrors, setIsErrors] = useState<any>(false)
+  const [followup, setFollowup] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [card, setCard] = useState<any>(props.card);
+  const [code, setCode] = useState<any>("");
+  const [codeView, setCodeView] = useState<boolean>(card.type === "code");
+  const [answer, setAnswer] = useState<string>("");
+  const [showAnswer, setShowAnswer] = useState<boolean>(false);
+  const [isErrors, setIsErrors] = useState<any>(false);
 
   function handleEditorDidMount(editor, monaco) {
-    monacoRef.current = monaco
+    monacoRef.current = monaco;
   }
 
   function doHandleInputChange(e) {
-    setFollowup(e.target.value)
-    handleInputChange(e)
+    e.preventDefault();
+    setFollowup(e.target.value);
+    handleInputChange(e);
   }
 
   async function doCheck(e) {
-    e.preventDefault()
+    e.preventDefault();
+
+    // if (messages.length) {
+    //   setMessages([])
+    // }
 
     if (card.type === "code") {
-      console.log("markers", monacoRef.current.editor.getModelMarkers())
-      let isErrors = monacoRef.current.editor.getModelMarkers().length
-      setIsErrors(isErrors)
-      console.log("isErrors", isErrors)
+      console.log("markers", monacoRef.current.editor.getModelMarkers());
+      let isErrors = monacoRef.current.editor.getModelMarkers().length;
+      setIsErrors(isErrors);
+      console.log("isErrors", isErrors);
       if (isErrors) {
-        return false
+        return false;
       }
     }
 
-    append({
-      role: "user",
-      content: `In JavaScript, is this the correct answer to the question? Question: ${card.question}. Answer: ${e.target.answer.value}. If not, show the correct answer.`,
-    })
+    if (!followup) {
+      append({
+        role: "user",
+        content: `In JavaScript, is this the correct answer to the question? Question: ${card.question}. Answer: ${e.target.answer.value}. If not, show the correct answer.`,
+      });
+    }
 
+    if (followup) {
+      append({
+        role: "user",
+        content: `${followup}`,
+      });
+      // setMessages([])
+      // debugger;
+    }
   }
 
   const doDelete = async () => {
-    let { error } = await supabase.from("cards").delete().eq("id", card.id)
+    let { error } = await supabase.from("cards").delete().eq("id", card.id);
     if (error) {
       let content = !error.code.length
         ? "Network error. Unable to delete card."
-        : error.message
+        : error.message;
       messageApi.open({
         type: "error",
         content,
         style: {
           marginTop: "20vh",
         },
-      })
+      });
     } else {
-      router.push("/cards")
+      router.push("/cards");
     }
-  }
+  };
 
   async function next() {
     const { count } = await supabase
       .from("cards")
-      .select("*", { count: "exact", head: true })
-    console.log("count", count)
-    let random = Math.floor(Math.random() * count - 1)
+      .select("*", { count: "exact", head: true });
+    console.log("count", count);
+    let random = Math.floor(Math.random() * count - 1);
     const { data } = await supabase
       .from("cards")
       .select("*")
-      .range(random, random + 1)
-    router.push(`/cards/${data[0].id}`)
+      .range(random, random + 1);
+    router.push(`/cards/${data[0].id}`);
   }
+
+  const userMessageClass = "text-pink-400 font-bold";
+  const aiMessageClass = "text-white-500";
 
   return (
     <div className="m-5">
@@ -159,7 +177,7 @@ export default function Answer(props) {
                       onMount={handleEditorDidMount}
                       defaultLanguage="javascript"
                       onChange={(value) => {
-                        setCode(value)
+                        setCode(value);
                       }}
                       options={{
                         minimap: {
@@ -208,7 +226,7 @@ export default function Answer(props) {
                     children={card.answer}
                     components={{
                       code({ node, inline, className, children, ...props }) {
-                        const match = /language-(\w+)/.exec(className || "")
+                        const match = /language-(\w+)/.exec(className || "");
                         return !inline && match ? (
                           <SyntaxHighlighter
                             {...props}
@@ -221,60 +239,71 @@ export default function Answer(props) {
                           <code {...props} className={className}>
                             {children}
                           </code>
-                        )
+                        );
                       },
                     }}
                   />
                 </div>
               )}
+
               <div className="mt-10 text-white">
-                {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
+                {/* {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
                 {answer.startsWith("Yes") && (
                   <HiCheckCircle size={50} color="green" />
-                )}
+                )} */}
                 {messages.length
                   ? messages.slice(1).map((m) => (
-                      <ReactMarkdown
+                      <div
                         key={m.id}
-                        children={m.content}
-                        components={{
-                          code({
-                            node,
-                            inline,
-                            className,
-                            children,
-                            ...props
-                          }) {
-                            const match = /language-(\w+)/.exec(className || "")
-                            return !inline && match ? (
-                              <SyntaxHighlighter
-                                {...props}
-                                children={String(children).replace(/\n$/, "")}
-                                style={theme}
-                                language={match[1]}
-                                PreTag="div"
-                              />
-                            ) : (
-                              <code {...props} className={className}>
-                                {children}
-                              </code>
-                            )
-                          },
-                        }}
-                      />
+                        className={`${
+                          m.role === "user" ? userMessageClass : aiMessageClass
+                        } p-2 rounded-lg mb-2`}
+                      >
+                        <ReactMarkdown
+                          key={m.id}
+                          children={m.content}
+                          components={{
+                            code({
+                              node,
+                              inline,
+                              className,
+                              children,
+                              ...props
+                            }) {
+                              const match = /language-(\w+)/.exec(
+                                className || ""
+                              );
+                              return !inline && match ? (
+                                <SyntaxHighlighter
+                                  {...props}
+                                  children={String(children).replace(/\n$/, "")}
+                                  style={theme}
+                                  className="text-red-900"
+                                  language={match[1]}
+                                  PreTag="div"
+                                />
+                              ) : (
+                                <code {...props} className={className}>
+                                  {children}
+                                </code>
+                              );
+                            },
+                          }}
+                        />
+                      </div>
                     ))
                   : null}
                 {messages.length ? (
                   <form
                     onSubmit={(e) => {
-                      setFollowup("")
-                      doCheck(e)
+                      setFollowup("");
+                      doCheck(e);
                     }}
                   >
                     <input
                       name="answer"
                       value={followup}
-                      className="text-white bg-black mt-5 p-2 border rounded-lg"
+                      className="text-white bg-black mt-5 p-2 w-96 rounded-lg bg-black focus:outline-none border-2 border-purple-500"
                       placeholder="Say something..."
                       onChange={doHandleInputChange}
                     />
@@ -286,5 +315,5 @@ export default function Answer(props) {
         </dl>
       </div>
     </div>
-  )
+  );
 }
