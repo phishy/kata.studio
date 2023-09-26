@@ -14,7 +14,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { funky as theme } from "react-syntax-highlighter/dist/esm/styles/prism"
 
-import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
+// import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
 import ReactMarkdown from "react-markdown"
 
 import { Alert, message } from "antd"
