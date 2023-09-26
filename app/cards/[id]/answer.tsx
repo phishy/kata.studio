@@ -48,6 +48,7 @@ export default function Answer(props) {
   }
 
   function doHandleInputChange(e) {
+    e.preventDefault()
     setFollowup(e.target.value)
     handleInputChange(e)
   }
@@ -65,11 +66,23 @@ export default function Answer(props) {
       }
     }
 
-    append({
-      role: "user",
-      content: `In JavaScript, is this the correct answer to the question? Question: ${card.question}. Answer: ${e.target.answer.value}. If not, show the correct answer.`,
-    })
+    if (!followup) {
+      append({
+        role: "user",
+        content: `In JavaScript, is this the correct answer to the question? Question: ${card.question}. Answer: ${e.target.answer.value}. If not, show the correct answer.`,
+      })
+    }
 
+    if (followup) {
+      append({
+        role: "user",
+        content: `${followup}`,
+      })
+    }
+  }
+
+  async function handleClearMessages() {
+    setMessages([])
   }
 
   const doDelete = async () => {
@@ -102,6 +115,9 @@ export default function Answer(props) {
       .range(random, random + 1)
     router.push(`/cards/${data[0].id}`)
   }
+
+  const userMessageClass = "text-pink-400 font-bold"
+  const aiMessageClass = "text-white-500"
 
   return (
     <div className="m-5">
@@ -174,6 +190,7 @@ export default function Answer(props) {
                     type="submit"
                     className="mt-5 bg-zinc-900"
                     disabled={isLoading}
+                    onClick={handleClearMessages}
                   >
                     Check
                   </Button>
@@ -227,41 +244,52 @@ export default function Answer(props) {
                   />
                 </div>
               )}
+
               <div className="mt-10 text-white">
-                {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
+                {/* {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
                 {answer.startsWith("Yes") && (
                   <HiCheckCircle size={50} color="green" />
-                )}
+                )} */}
                 {messages.length
                   ? messages.slice(1).map((m) => (
-                      <ReactMarkdown
+                      <div
                         key={m.id}
-                        children={m.content}
-                        components={{
-                          code({
-                            node,
-                            inline,
-                            className,
-                            children,
-                            ...props
-                          }) {
-                            const match = /language-(\w+)/.exec(className || "")
-                            return !inline && match ? (
-                              <SyntaxHighlighter
-                                {...props}
-                                children={String(children).replace(/\n$/, "")}
-                                style={theme}
-                                language={match[1]}
-                                PreTag="div"
-                              />
-                            ) : (
-                              <code {...props} className={className}>
-                                {children}
-                              </code>
-                            )
-                          },
-                        }}
-                      />
+                        className={`${
+                          m.role === "user" ? userMessageClass : aiMessageClass
+                        } p-2 rounded-lg mb-2`}
+                      >
+                        <ReactMarkdown
+                          key={m.id}
+                          children={m.content}
+                          components={{
+                            code({
+                              node,
+                              inline,
+                              className,
+                              children,
+                              ...props
+                            }) {
+                              const match = /language-(\w+)/.exec(
+                                className || ""
+                              )
+                              return !inline && match ? (
+                                <SyntaxHighlighter
+                                  {...props}
+                                  children={String(children).replace(/\n$/, "")}
+                                  style={theme}
+                                  className="text-red-900"
+                                  language={match[1]}
+                                  PreTag="div"
+                                />
+                              ) : (
+                                <code {...props} className={className}>
+                                  {children}
+                                </code>
+                              )
+                            },
+                          }}
+                        />
+                      </div>
                     ))
                   : null}
                 {messages.length ? (
@@ -274,7 +302,7 @@ export default function Answer(props) {
                     <input
                       name="answer"
                       value={followup}
-                      className="text-white bg-black mt-5 p-2 border rounded-lg"
+                      className="text-white bg-black mt-5 p-2 w-96 rounded-lg bg-black focus:outline-none border-2 border-purple-500"
                       placeholder="Say something..."
                       onChange={doHandleInputChange}
                     />
