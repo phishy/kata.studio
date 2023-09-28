@@ -4,6 +4,8 @@ import Link from "next/link"
 
 import Search from "@/components/Search"
 
+import Filter from "@/components/ui/Filter"
+
 export const revalidate = 0
 
 interface Card {
@@ -15,33 +17,38 @@ interface Card {
 
 interface PageProps {
   params: { id: string }
-  searchParams: { q?: string }
+  searchParams: { q?: string, difficulty?: string}
 }
 
 export default async function Page({ params, searchParams }: PageProps) {
   const supabase = createServerComponentClient({
     cookies,
   })
-
   let res: any
+  let query = supabase.from("cards").select("id,title,difficulty,question").limit(100)
+
   if (searchParams.q) {
-    res = await supabase
-      .from("cards")
-      .select("id,title,difficulty,question")
-      .or(
-        `title.ilike."%${searchParams.q}%",question.ilike."%${searchParams.q}%",answer.ilike."%${searchParams.q}%"`
-      )
-      .limit(100)
-  } else {
-    res = await supabase.from("cards").select("id,title,difficulty,question").limit(100)
+    query.or(
+      `title.ilike."%${searchParams.q}%",question.ilike."%${searchParams.q}%",answer.ilike."%${searchParams.q}%"`
+    )
+  } 
+  
+  if (searchParams.difficulty) {
+    query.eq("difficulty", searchParams.difficulty)
+
   }
+
+  res = await query;
 
   let { data } = res
 
   return (
     <div className="p-5 md:p-7 bg-black">
       <h1 className="text-white text-xl mb-5">Card Library</h1>
+      <div className="flex space-x-4">
       <Search type="cards" q={searchParams?.q} />
+      <Filter />
+    </div>
       <div className="grid grid-rows-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {data?.map((card: any) => (
           <Link
@@ -57,9 +64,7 @@ export default async function Page({ params, searchParams }: PageProps) {
                 </span>
               )}
 
-              <div className="text-white mb-2">
-                {card.title}
-              </div>
+              <div className="text-white mb-2">{card.title}</div>
               {/* <div className="text-gray-500">{card.description}</div> */}
             </div>
           </Link>
