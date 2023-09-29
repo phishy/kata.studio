@@ -83,7 +83,7 @@ export default function Answer(props) {
 
   async function handleClearMessages() {
     setMessages([])
-    }
+  }
 
   const doDelete = async () => {
     let { error } = await supabase.from("cards").delete().eq("id", card.id)
@@ -247,10 +247,10 @@ export default function Answer(props) {
               )}
 
               <div className="mt-10 text-white">
-                {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
+                {/* {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
                 {answer.startsWith("Yes") && (
                   <HiCheckCircle size={50} color="green" />
-                )}
+                )} */}
                 {messages.length
                   ? messages.slice(1).map((m) => (
                       <ReactMarkdown
@@ -258,39 +258,33 @@ export default function Answer(props) {
                         className={`${
                           m.role === "user" ? userMessageClass : aiMessageClass
                         } p-2 rounded-lg mb-2`}
-                      >
-                        <ReactMarkdown
-                          key={m.id}
-                          children={m.content}
-                          components={{
-                            code({
-                              node,
-                              inline,
-                              className,
-                              children,
-                              ...props
-                            }) {
-                              const match = /language-(\w+)/.exec(
-                                className || ""
-                              )
-                              return !inline && match ? (
-                                <SyntaxHighlighter
-                                  {...props}
-                                  children={String(children).replace(/\n$/, "")}
-                                  style={theme}
-                                  className="text-red-900"
-                                  language={match[1]}
-                                  PreTag="div"
-                                />
-                              ) : (
-                                <code {...props} className={className}>
-                                  {children}
-                                </code>
-                              )
-                            },
-                          }}
-                        />
-                      </div>
+                        children={m.content}
+                        components={{
+                          code({
+                            node,
+                            inline,
+                            className,
+                            children,
+                            ...props
+                          }) {
+                            const match = /language-(\w+)/.exec(className || "")
+                            return !inline && match ? (
+                              <SyntaxHighlighter
+                                {...props}
+                                children={String(children).replace(/\n$/, "")}
+                                style={theme}
+                                className="text-red-900"
+                                language={match[1]}
+                                PreTag="div"
+                              />
+                            ) : (
+                              <code {...props} className={className}>
+                                {children}
+                              </code>
+                            )
+                          },
+                        }}
+                      />
                     ))
                   : null}
                 {messages.length ? (
