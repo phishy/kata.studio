@@ -14,7 +14,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { funky as theme } from "react-syntax-highlighter/dist/esm/styles/prism"
 
-// import { HiXCircle, HiCheckCircle } from "react-icons/hi2";
+// import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
 import ReactMarkdown from "react-markdown"
 
 import { Alert, message } from "antd"
@@ -27,7 +27,7 @@ export default function Answer(props) {
     handleSubmit,
     append,
     setMessages,
-  } = useChat();
+  } = useChat()
 
   const monacoRef = useRef(null)
   const supabase = createClientComponentClient()
@@ -90,7 +90,7 @@ export default function Answer(props) {
     if (error) {
       let content = !error.code.length
         ? "Network error. Unable to delete card."
-        : error.message;
+        : error.message
       messageApi.open({
         type: "error",
         content,
@@ -101,14 +101,15 @@ export default function Answer(props) {
     } else {
       router.push("/cards")
     }
-  };
+  }
 
   async function next() {
     const { count } = await supabase
       .from("cards")
       .select("*", { count: "exact", head: true })
     console.log("count", count)
-    let random = Math.floor(Math.random() * count - 1);
+    let random = Math.floor(Math.random() * count - 1)
+
     const { data } = await supabase
       .from("cards")
       .select("*")
@@ -175,7 +176,7 @@ export default function Answer(props) {
                       onMount={handleEditorDidMount}
                       defaultLanguage="javascript"
                       onChange={(value) => {
-                        setCode(value);
+                        setCode(value)
                       }}
                       options={{
                         minimap: {
@@ -225,7 +226,7 @@ export default function Answer(props) {
                     children={card.answer}
                     components={{
                       code({ node, inline, className, children, ...props }) {
-                        const match = /language-(\w+)/.exec(className || "");
+                        const match = /language-(\w+)/.exec(className || "")
                         return !inline && match ? (
                           <SyntaxHighlighter
                             {...props}
@@ -245,15 +246,14 @@ export default function Answer(props) {
                 </div>
               )}
 
-
               <div className="mt-10 text-white">
-                {/* {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
+                {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
                 {answer.startsWith("Yes") && (
                   <HiCheckCircle size={50} color="green" />
-                )} */}
+                )}
                 {messages.length
                   ? messages.slice(1).map((m) => (
-                      <div
+                      <ReactMarkdown
                         key={m.id}
                         className={`${
                           m.role === "user" ? userMessageClass : aiMessageClass
@@ -303,7 +303,7 @@ export default function Answer(props) {
                     <input
                       name="answer"
                       value={followup}
-                      className="text-white bg-black mt-5 p-2 w-96 rounded-lg bg-black focus:outline-none border-2 border-purple-500"
+                      className="text-white bg-black mt-5 p-2 border rounded-lg"
                       placeholder="Say something..."
                       onChange={doHandleInputChange}
                     />
@@ -315,5 +315,5 @@ export default function Answer(props) {
         </dl>
       </div>
     </div>
-  );
+  )
 }
