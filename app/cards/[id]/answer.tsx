@@ -14,7 +14,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { funky as theme } from "react-syntax-highlighter/dist/esm/styles/prism"
 
-import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
+// import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
 import ReactMarkdown from "react-markdown"
 
 import { Alert, message } from "antd"
@@ -48,6 +48,7 @@ export default function Answer(props) {
   }
 
   function doHandleInputChange(e) {
+    e.preventDefault()
     setFollowup(e.target.value)
     handleInputChange(e)
   }
@@ -65,11 +66,23 @@ export default function Answer(props) {
       }
     }
 
-    append({
-      role: "user",
-      content: `In JavaScript, is this the correct answer to the question? Question: ${card.question}. Answer: ${e.target.answer.value}. If not, show the correct answer.`,
-    })
+    if (!followup) {
+      append({
+        role: "user",
+        content: `In JavaScript, is this the correct answer to the question? Question: ${card.question}. Answer: ${e.target.answer.value}. If not, show the correct answer.`,
+      })
+    }
 
+    if (followup) {
+      append({
+        role: "user",
+        content: `${followup}`,
+      })
+    }
+  }
+
+  async function handleClearMessages() {
+    setMessages([])
   }
 
   const doDelete = async () => {
@@ -96,12 +109,16 @@ export default function Answer(props) {
       .select("*", { count: "exact", head: true })
     console.log("count", count)
     let random = Math.floor(Math.random() * count - 1)
+
     const { data } = await supabase
       .from("cards")
       .select("*")
       .range(random, random + 1)
     router.push(`/cards/${data[0].id}`)
   }
+
+  const userMessageClass = "text-pink-400 font-bold"
+  const aiMessageClass = "text-white-500"
 
   return (
     <div className="m-5">
@@ -174,6 +191,7 @@ export default function Answer(props) {
                     type="submit"
                     className="mt-5 bg-zinc-900"
                     disabled={isLoading}
+                    onClick={handleClearMessages}
                   >
                     Check
                   </Button>
@@ -227,15 +245,19 @@ export default function Answer(props) {
                   />
                 </div>
               )}
+
               <div className="mt-10 text-white">
-                {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
+                {/* {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
                 {answer.startsWith("Yes") && (
                   <HiCheckCircle size={50} color="green" />
-                )}
+                )} */}
                 {messages.length
                   ? messages.slice(1).map((m) => (
                       <ReactMarkdown
                         key={m.id}
+                        className={`${
+                          m.role === "user" ? userMessageClass : aiMessageClass
+                        } p-2 rounded-lg mb-2`}
                         children={m.content}
                         components={{
                           code({
@@ -251,6 +273,7 @@ export default function Answer(props) {
                                 {...props}
                                 children={String(children).replace(/\n$/, "")}
                                 style={theme}
+                                className="text-red-900"
                                 language={match[1]}
                                 PreTag="div"
                               />
