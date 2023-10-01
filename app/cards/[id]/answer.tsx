@@ -1,23 +1,40 @@
 "use client"
 
-import Editor from "@monaco-editor/react"
+import { Alert, message } from "antd"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { useRef, useState } from "react"
+
+import useWindowSize from "react-use/lib/useWindowSize"
+import Confetti from "react-confetti"
+
 import { Button } from "@/components/ui/button"
-import { useState, useRef } from "react"
-import { Textarea } from "@/components/ui/textarea"
+import Editor from "@monaco-editor/react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import ReactMarkdown from "react-markdown"
 import SelectPlaylist from "@/components/SelectPlaylist"
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
+import { Textarea } from "@/components/ui/textarea"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { funky as theme } from "react-syntax-highlighter/dist/esm/styles/prism"
+import { useChat } from "ai/react"
 import { useRouter } from "next/navigation"
 
-import { useChat } from "ai/react"
-
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
-import { funky as theme } from "react-syntax-highlighter/dist/esm/styles/prism"
-
-// import { HiXCircle, HiCheckCircle } from "react-icons/hi2"
-import ReactMarkdown from "react-markdown"
-
-import { Alert, message } from "antd"
+import TranscribeButton from "@/components/TranscribeButton"
 
 export default function Answer(props) {
   const {
@@ -27,18 +44,26 @@ export default function Answer(props) {
     handleSubmit,
     append,
     setMessages,
-  } = useChat()
+    isLoading,
+  } = useChat({
+    onFinish: (message) => {
+      if (message.content.toLowerCase().startsWith("yes")) {
+        setShowConfetti(true)
+      }
+    },
+  })
 
   const monacoRef = useRef(null)
   const supabase = createClientComponentClient()
   let router = useRouter()
   const [messageApi, contextHolder] = message.useMessage()
+  const { width, height } = useWindowSize()
+  const [showConfetti, setShowConfetti] = useState(false)
 
   const [followup, setFollowup] = useState<string>("")
-  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [card, setCard] = useState<any>(props.card)
   const [code, setCode] = useState<any>("")
-  const [codeView, setCodeView] = useState<boolean>(card.type === "code")
+  const [type, setType] = useState<string>(props.card.type)
   const [answer, setAnswer] = useState<string>("")
   const [showAnswer, setShowAnswer] = useState<boolean>(false)
   const [isErrors, setIsErrors] = useState<any>(false)
@@ -123,56 +148,50 @@ export default function Answer(props) {
   return (
     <div className="m-5">
       {contextHolder}
-      <div className="px-4 sm:px-0">
-        {card.difficulty && (
-          <span className="mb-2 inline-flex items-center rounded-md bg-pink-400/10 px-2 py-1 text-xs font-medium text-pink-400 ring-1 ring-inset ring-pink-400/20">
-            {card.difficulty}
-          </span>
-        )}
-        {/* <h3 className="text-2xl text-base font-semibold leading-7 text-zinc-400">
-          {card.question}
-        </h3> */}
-        <div className="flex flex-col bg-zinc-800 shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:shadow-slate-700/[.7]">
-          <div className="p-4 md:p-10">
-            <h3 className="text-lg font-light  dark:text-white">
-              {card.question}
-            </h3>
-            {/* <p class="mt-2 text-gray-800 dark:text-gray-400">
-              With supporting text below as a natural lead-in to additional
-              content.
-            </p> */}
-          </div>
-        </div>
-        {isErrors ? (
-          <Alert
-            message="Cannot submit with syntax errors"
-            type="warning"
-            className="mt-3"
-          />
-        ) : null}
-        {/* <p className="text-xl mt-1 max-w-2xl leading-6 text-gray-500">
-          {card.question}
-        </p> */}
-      </div>
-      <div className="border-gray-100">
-        <dl className="divide-y divide-gray-100">
-          <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              <form onSubmit={doCheck}>
-                {!messages.length && !showAnswer && !codeView && (
+      {showConfetti && <Confetti width={width} height={height} />}
+
+      <form onSubmit={doCheck}>
+        <Card className="w-[100%]">
+          <CardHeader>
+            <CardTitle>{card.question}</CardTitle>
+            <CardDescription>
+              {type.charAt(0).toUpperCase() + type.slice(1)} Answer
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid w-full items-center gap-4">
+              {" "}
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="framework">Response Type</Label>
+                <Select value={type} onValueChange={(val) => setType(val)}>
+                  <SelectTrigger id="type">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="code">Code</SelectItem>
+                    <SelectItem value="text">Text</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="name">Answer</Label>
+                {type == "text" && (
                   <Textarea
                     name="answer"
                     onChange={handleInputChange}
-                    value={input}
-                  ></Textarea>
+                    placeholder="Write your response here"
+                    value={answer}
+                  />
                 )}
-                {codeView && (
+                <TranscribeButton onFinish={(data) => setAnswer(data)}/>
+                {type == "code" && (
                   <>
                     <input type="hidden" name="answer" value={code} />
                     <Editor
-                      key={codeView.toString()}
+                      // key={codeView.toString()}
                       theme="vs-dark"
                       height="30vh"
+                      width="100%"
                       onMount={handleEditorDidMount}
                       defaultLanguage="javascript"
                       onChange={(value) => {
@@ -186,42 +205,52 @@ export default function Answer(props) {
                     />
                   </>
                 )}
-                <div className="flex gap-1 mb-4">
-                  <Button
-                    type="submit"
-                    className="mt-5 bg-zinc-900"
-                    disabled={isLoading}
-                    onClick={handleClearMessages}
-                  >
-                    Check
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => setShowAnswer(!showAnswer)}
-                    className="mt-5 bg-zinc-900"
-                    disabled={isLoading}
-                  >
-                    Show Answer
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={doDelete}
-                    className="mt-5 bg-zinc-900"
-                  >
-                    Delete
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={next}
-                    className="mt-5 bg-zinc-900"
-                  >
-                    Next
-                  </Button>
-                </div>
-              </form>
-              <SelectPlaylist card_id={card.id} />
+              </div>
+              {isErrors ? (
+                <Alert
+                  message="Cannot submit with syntax errors"
+                  type="warning"
+                  className="mt-3"
+                />
+              ) : null}
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <div className="flex gap-1 mt-4 mb-4">
+              <Button
+                type="submit"
+                disabled={isLoading}
+                onClick={handleClearMessages}
+                loading={isLoading}
+              >
+                Check
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setShowAnswer(!showAnswer)}
+                disabled={isLoading}
+                variant="outline"
+              >
+                Reveal
+              </Button>
+              <Button type="button" onClick={doDelete} variant="outline">
+                Delete
+              </Button>
+              <Button type="button" onClick={next} variant="outline">
+                Next
+              </Button>
+              {/* <SelectPlaylist card_id={card.id} /> */}
+            </div>
+          </CardFooter>
+        </Card>
+      </form>
+
+      <div className="border-gray-100">
+        <dl className="divide-y divide-gray-100">
+          <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
               {showAnswer && (
-                <div className="mt-5 text-white">
+                <div className="mt-2 text-white">
                   <ReactMarkdown
                     children={card.answer}
                     components={{
@@ -246,11 +275,7 @@ export default function Answer(props) {
                 </div>
               )}
 
-              <div className="mt-10 text-white">
-                {/* {answer.startsWith("No") && <HiXCircle size={50} color="red" />}
-                {answer.startsWith("Yes") && (
-                  <HiCheckCircle size={50} color="green" />
-                )} */}
+              <div className="text-white">
                 {messages.length
                   ? messages.slice(1).map((m) => (
                       <ReactMarkdown
@@ -297,7 +322,7 @@ export default function Answer(props) {
                     <input
                       name="answer"
                       value={followup}
-                      className="text-white bg-black mt-5 p-2 border rounded-lg"
+                      className="text-white bg-black mt-5 p-2 border rounded-lg w-[100%]"
                       placeholder="Say something..."
                       onChange={doHandleInputChange}
                     />

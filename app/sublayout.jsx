@@ -12,6 +12,8 @@ import { Disclosure, Menu, Transition } from "@headlessui/react"
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import { useRouter } from "next/navigation"
 
+import { ThemeProvider } from "@/components/theme-provider"
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
@@ -70,47 +72,48 @@ export default function SubLayout(props) {
           {`;(function(){const birdeatsbug=(window.birdeatsbug=window.birdeatsbug||[]);if(birdeatsbug.initialize)return;if(birdeatsbug.invoked){if(window.console&&console.error){console.error('birdeatsbug snippet included twice.')}return}birdeatsbug.invoked=true;birdeatsbug.methods=['setOptions','trigger','resumeSession','takeScreenshot','startRecording','stopRecording','stopSession','uploadSession','deleteSession'];birdeatsbug.factory=function(method){return function(){const args=Array.prototype.slice.call(arguments);args.unshift(method);birdeatsbug.push(args);return birdeatsbug}};for(let i=0;i<birdeatsbug.methods.length;i++){const key=birdeatsbug.methods[i];birdeatsbug[key]=birdeatsbug.factory(key)}birdeatsbug.load=function(){const script=document.createElement('script');script.type='module';script.async=true;script.src='https://sdk.birdeatsbug.com/v2/core.js';const mountJsBefore=document.getElementsByTagName('script')[0]||document.body.firstChild;mountJsBefore.parentNode.insertBefore(script,mountJsBefore);const style=document.createElement('link');style.rel='stylesheet';style.type='text/css';style.href='https://sdk.birdeatsbug.com/v2/style.css';const mountCssBefore=document.querySelector('link[rel="stylesheet"]')||mountJsBefore;mountCssBefore.parentNode.insertBefore(style,mountCssBefore)};birdeatsbug.load();window.birdeatsbug.setOptions({publicAppId:'1522826c-f252-4d41-88fa-7c36df05a8f1'})})();
 `}
         </Script> */}
-        <div className="min-h-full">
-          <Disclosure as="nav" className="bg-gray-900">
-            {({ open }) => (
-              <>
-                <div className="mx-auto px-4 sm:px-6 lg:px-8">
-                  <div className="flex h-16 items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <Link href="/">
-                          <Logo />
-                        </Link>
-                        {/* <img
+        <ThemeProvider attribute="class" defaultTheme="dark">
+          <div className="min-h-full">
+            <Disclosure as="nav" className="bg-gray-900">
+              {({ open }) => (
+                <>
+                  <div className="mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex h-16 items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <Link href="/">
+                            <Logo />
+                          </Link>
+                          {/* <img
                           className="h-8 w-8"
                           src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
                           alt="Your Company"
                         /> */}
-                      </div>
-                      <div className="hidden md:block">
-                        <div className="ml-10 flex items-baseline space-x-4">
-                          {navigation.map((item) => (
-                            <Link
-                              key={item.name}
-                              href={item.onClick ? "" : item.href}
-                              onClick={item.onClick}
-                              className={classNames(
-                                item.current
-                                  ? "bg-gray-900 text-white"
-                                  : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                                "rounded-md px-3 py-2 text-sm font-medium"
-                              )}
-                              aria-current={item.current ? "page" : undefined}
-                            >
-                              {item.name}
-                            </Link>
-                          ))}
+                        </div>
+                        <div className="hidden md:block">
+                          <div className="ml-10 flex items-baseline space-x-4">
+                            {navigation.map((item) => (
+                              <Link
+                                key={item.name}
+                                href={item.onClick ? "" : item.href}
+                                onClick={item.onClick}
+                                className={classNames(
+                                  item.current
+                                    ? "bg-gray-900 text-white"
+                                    : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                                  "rounded-md px-3 py-2 text-sm font-medium"
+                                )}
+                                aria-current={item.current ? "page" : undefined}
+                              >
+                                {item.name}
+                              </Link>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="hidden md:block">
-                      <div className="ml-4 flex items-center md:ml-6">
-                        {/* <button
+                      <div className="hidden md:block">
+                        <div className="ml-4 flex items-center md:ml-6">
+                          {/* <button
                           type="button"
                           className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                         >
@@ -119,8 +122,8 @@ export default function SubLayout(props) {
                           <BellIcon className="h-6 w-6" aria-hidden="true" />
                         </button> */}
 
-                        {/* Profile dropdown */}
-                        {/* <Menu as="div" className="relative ml-3">
+                          {/* Profile dropdown */}
+                          {/* <Menu as="div" className="relative ml-3">
                           <div>
                             <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                               <span className="absolute -inset-1.5" />
@@ -161,50 +164,50 @@ export default function SubLayout(props) {
                             </Menu.Items>
                           </Transition>
                         </Menu> */}
+                        </div>
+                      </div>
+                      <div className="-mr-2 flex md:hidden">
+                        {/* Mobile menu button */}
+                        <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                          <span className="absolute -inset-0.5" />
+                          <span className="sr-only">Open main menu</span>
+                          {open ? (
+                            <XMarkIcon
+                              className="block h-6 w-6"
+                              aria-hidden="true"
+                            />
+                          ) : (
+                            <Bars3Icon
+                              className="block h-6 w-6"
+                              aria-hidden="true"
+                            />
+                          )}
+                        </Disclosure.Button>
                       </div>
                     </div>
-                    <div className="-mr-2 flex md:hidden">
-                      {/* Mobile menu button */}
-                      <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                        <span className="absolute -inset-0.5" />
-                        <span className="sr-only">Open main menu</span>
-                        {open ? (
-                          <XMarkIcon
-                            className="block h-6 w-6"
-                            aria-hidden="true"
-                          />
-                        ) : (
-                          <Bars3Icon
-                            className="block h-6 w-6"
-                            aria-hidden="true"
-                          />
-                        )}
-                      </Disclosure.Button>
-                    </div>
                   </div>
-                </div>
 
-                <Disclosure.Panel className="md:hidden">
-                  <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-                    {navigation.map((item) => (
-                      <Disclosure.Button
-                        key={item.name}
-                        as="a"
-                        href={item.onClick ? "" : item.href}
-                        onClick={item.onClick}
-                        className={classNames(
-                          item.current
-                            ? "bg-gray-900 text-white"
-                            : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                          "block rounded-md px-3 py-2 text-base font-medium"
-                        )}
-                        aria-current={item.current ? "page" : undefined}
-                      >
-                        {item.name}
-                      </Disclosure.Button>
-                    ))}
-                  </div>
-                  {/* <div className="border-t border-gray-700 pb-3 pt-4">
+                  <Disclosure.Panel className="md:hidden">
+                    <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
+                      {navigation.map((item) => (
+                        <Disclosure.Button
+                          key={item.name}
+                          as="a"
+                          href={item.onClick ? "" : item.href}
+                          onClick={item.onClick}
+                          className={classNames(
+                            item.current
+                              ? "bg-gray-900 text-white"
+                              : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                            "block rounded-md px-3 py-2 text-base font-medium"
+                          )}
+                          aria-current={item.current ? "page" : undefined}
+                        >
+                          {item.name}
+                        </Disclosure.Button>
+                      ))}
+                    </div>
+                    {/* <div className="border-t border-gray-700 pb-3 pt-4">
                     <div className="flex items-center px-5">
                       <div className="flex-shrink-0">
                         <img
@@ -244,24 +247,25 @@ export default function SubLayout(props) {
                       ))}
                     </div>
                   </div> */}
-                </Disclosure.Panel>
-              </>
-            )}
-          </Disclosure>
+                  </Disclosure.Panel>
+                </>
+              )}
+            </Disclosure>
 
-          {/* <header className="bg-white shadow-sm">
+            {/* <header className="bg-white shadow-sm">
             <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
               <h1 className="text-lg font-semibold leading-6 text-gray-900">
                 Dashboard
               </h1>
             </div>
           </header> */}
-          <main>
-            <div className="mx-auto">
-              <App>{props.children}</App>
-            </div>
-          </main>
-        </div>
+            <main>
+              <div className="mx-auto">
+                <App>{props.children}</App>
+              </div>
+            </main>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   )
