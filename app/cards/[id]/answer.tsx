@@ -1,6 +1,7 @@
 "use client"
 
 import { Alert, message } from "antd"
+
 import {
   Card,
   CardContent,
@@ -178,12 +179,12 @@ export default function Answer(props) {
                 {type == "text" && (
                   <Textarea
                     name="answer"
-                    onChange={handleInputChange}
+                    onChange={(e) => setAnswer(e.target.value)}
                     placeholder="Write your response here"
                     value={answer}
                   />
                 )}
-                <TranscribeButton onFinish={(data) => setAnswer(data)}/>
+                {/* <TranscribeButton onFinish={(data) => setAnswer(data)}/> */}
                 {type == "code" && (
                   <>
                     <input type="hidden" name="answer" value={code} />

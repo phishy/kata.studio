@@ -79,6 +79,9 @@ export default function NewCardForm() {
     })
   }
 
+  const userMessageClass = "text-pink-400 font-bold"
+  const aiMessageClass = "text-white-500"
+
   return (
     <div className="m-5">
       <form action={handleCreate} onSubmit={handleSubmit}>
@@ -149,28 +152,36 @@ export default function NewCardForm() {
       ) : null}
 
       <div className="m-2 mt-5">
-        <ReactMarkdown
-          children={answer}
-          components={{
-            code({ node, inline, className, children, ...props }) {
-              const match = /language-(\w+)/.exec(className || "")
-              return !inline && match ? (
-                <SyntaxHighlighter
-                  {...props}
-                  children={String(children).replace(/\n$/, "")}
-                  style={theme}
-                  className="text-red-900"
-                  language={match[1]}
-                  PreTag="div"
-                />
-              ) : (
-                <code {...props} className={className}>
-                  {children}
-                </code>
-              )
-            },
-          }}
-        />
+        {messages.length
+          ? messages.slice(1).map((m) => (
+              <ReactMarkdown
+                key={m.id}
+                className={`${
+                  m.role === "user" ? userMessageClass : aiMessageClass
+                } p-2 rounded-lg mb-2`}
+                children={m.content}
+                components={{
+                  code({ node, inline, className, children, ...props }) {
+                    const match = /language-(\w+)/.exec(className || "")
+                    return !inline && match ? (
+                      <SyntaxHighlighter
+                        {...props}
+                        children={String(children).replace(/\n$/, "")}
+                        style={theme}
+                        className="text-red-900"
+                        language={match[1]}
+                        PreTag="div"
+                      />
+                    ) : (
+                      <code {...props} className={className}>
+                        {children}
+                      </code>
+                    )
+                  },
+                }}
+              />
+            ))
+          : null}
       </div>
     </div>
   )
