@@ -56,6 +56,7 @@ export default function Filter() {
           {['easy', 'medium', 'hard'].map((difficulty) => (
             <label
               key={difficulty}
+              for="difficulty"
               onClick={() => handleFilterClick(difficulty)}
               className={`cursor-pointer px-8 py-2 flex hover:bg-black`}
             >
