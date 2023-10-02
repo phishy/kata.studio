@@ -34,7 +34,7 @@ export default async function Page({ params, searchParams }: PageProps) {
   } 
   
   if (searchParams.difficulty) {
-    query.eq("difficulty", searchParams.difficulty)
+    query.in("difficulty", [searchParams.difficulty])
 
   }
 
