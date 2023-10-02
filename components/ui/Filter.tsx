@@ -1,15 +1,30 @@
 'use client'
+
 import { useRouter } from 'next/navigation';
-import React, {useEffect, useRef} from 'react';
 import { set } from 'react-hook-form';
+import React, { useEffect, useRef, useState } from 'react';
+
 
 export default function Filter() {
   const router = useRouter();
   const dropdownRef = useRef(null);
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedDifficulties, setSelectedDifficulties] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.getAll('difficulty');
+  });
 
   const handleFilterClick = (difficulty) => {
-    router.push(`?difficulty=${difficulty}`);
+    let updatedDifficulties;
+    if (selectedDifficulties.includes(difficulty)) {
+      updatedDifficulties = selectedDifficulties.filter(d => d !== difficulty);
+    } else {
+      updatedDifficulties = [...selectedDifficulties, difficulty];
+    }
+    setSelectedDifficulties(updatedDifficulties);
+    const params = new URLSearchParams();
+    updatedDifficulties.forEach(diff => params.append('difficulty', diff));
+    router.push(`/cards?${params.toString()}`);
   };
 
   const handleFilterOpen = () => {
@@ -17,6 +32,7 @@ export default function Filter() {
   }
 
   const handleClearFilter = () => {
+    setSelectedDifficulties([]);
     router.push('/cards');
     setIsOpen(false);
   }
@@ -27,7 +43,6 @@ export default function Filter() {
         setIsOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -40,25 +55,31 @@ export default function Filter() {
         Filters
       </button>
       {isOpen && (
-        
-      <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-900 hover:bg-gray-900">
-        {['easy', 'medium', 'hard'].map((difficulty) => (
+        <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-900 hover:bg-gray-900">
+          {['easy', 'medium', 'hard'].map((difficulty) => (
+            <label
+              key={difficulty}
+              for="difficulty"
+              onClick={() => handleFilterClick(difficulty)}
+              className={`cursor-pointer px-8 py-2 flex hover:bg-black`}
+            >
+              <input 
+                className="flex mr-2" 
+                type="checkbox" 
+                checked={selectedDifficulties.includes(difficulty)}
+                onChange={() => {}}
+              />
+              {difficulty}
+            </label>
+          ))}
           <div 
-            key={difficulty} 
-            onClick={() => handleFilterClick(difficulty)}
-            className={`cursor-pointer px-8 py-2 hover:bg-black`}
-          >
-            {difficulty}
-          </div>
-        ))}
-        <div 
             onClick={handleClearFilter}
             className={`cursor-pointer px-8 py-2 hover:bg-gray-900 border-t border-gray-700`}
           >
             clear filters
           </div>
-      </div>
-      )} 
+        </div>
+      )}
     </div>
   );
 }

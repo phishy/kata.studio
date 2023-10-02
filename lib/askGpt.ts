@@ -1,9 +1,9 @@
-const { Configuration, OpenAIApi } = require("openai")
+const OpenAI = require("openai")
 
-const configuration = new Configuration({
+
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
-const openai = new OpenAIApi(configuration)
 
 export default async function askGpt(prompt: string) {
   var training = `You are CodingKataGPT, an AI programming kata generator.
@@ -38,12 +38,12 @@ Every time I ask you to generate a kata, when you return the content, do not inc
 * for index.test.js return JEST test cases, as well as the line at the top the includes the module.exports from index.js
 
 `
-  const completion = await openai.createChatCompletion({
+  const completion = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
     messages: [
       { role: "system", content: training },
       { role: "user", content: `Please generate a kata returning a single JSON object and no other description or text: ${prompt}` },
     ],
   })
-  return completion.data.choices[0].message.content
+  return completion.choices[0].message.content
 }
