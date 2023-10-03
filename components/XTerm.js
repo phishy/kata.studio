@@ -27,7 +27,7 @@ const XTermComponent = forwardRef((props, ref) => {
     initTerminal()
 
     return () => {
-      ref.current.dispose()
+      ref.current?.dispose()
     }
   }, [ref])
 
