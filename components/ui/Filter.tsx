@@ -1,7 +1,9 @@
 'use client'
 
 import { useRouter } from 'next/navigation';
+import { set } from 'react-hook-form';
 import React, { useEffect, useRef, useState } from 'react';
+
 
 export default function Filter() {
   const router = useRouter();
@@ -32,6 +34,7 @@ export default function Filter() {
   const handleClearFilter = () => {
     setSelectedDifficulties([]);
     router.push('/cards');
+    setIsOpen(false);
   }
 
   useEffect(() => {
