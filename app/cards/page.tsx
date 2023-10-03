@@ -25,7 +25,7 @@ export default async function Page({ params, searchParams }: PageProps) {
     cookies,
   })
   let res: any
-  let query = supabase.from("cards").select("id,title,difficulty,question").limit(100)
+  let query = supabase.from("cards_random").select("id,title,difficulty,question").limit(100)
 
   if (searchParams.q) {
     query.or(
