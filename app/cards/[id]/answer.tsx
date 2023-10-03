@@ -131,15 +131,16 @@ export default function Answer(props) {
 
   async function next() {
     const { count } = await supabase
-      .from("cards")
-      .select("*", { count: "exact", head: true })
-    console.log("count", count)
-    let random = Math.floor(Math.random() * count - 1)
+      .from("cards_random")
+      .select("*")
+      .eq("card_id", card.id)
+      .single()
+
 
     const { data } = await supabase
-      .from("cards")
+      .from("cards_random")
       .select("*")
-      .range(random, random + 1)
+      .limit(1)
     router.push(`/cards/${data[0].id}`)
   }
 
