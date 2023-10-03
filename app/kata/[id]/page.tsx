@@ -143,13 +143,8 @@ export default function Home() {
     setShowConfetti(false)
     const { count } = await supabase
       .from("katas")
-      .select("*", { count: "exact", head: true })
-    console.log("count", count)
-    let random = Math.floor(Math.random() * count - 1)
-    const { data } = await supabase
-      .from("katas")
       .select("*")
-      .range(random, random + 1)
+      .limit(1);
     router.push(`/kata/${data[0].id}`)
   }
 
